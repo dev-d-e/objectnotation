@@ -4,12 +4,16 @@ import java.util.Objects;
 import java.util.function.IntConsumer;
 
 /**
- * Parse value.
+ * ValueParser.
  */
 final class ValueParser {
 
 	final IntConsumer valueConsumer;
-	private IntToFunction currentFunction;
+
+	final ValueReader valueReader = new ValueReader(this);
+	final BackslashConverter backslashConverter = new BackslashConverter(this);
+	final QuoteValueReader quoteValue = new QuoteValueReader(this);
+	private IntToFunction currentFunction = valueReader;
 
 	/**
 	 * Constructs a {@code ValueParser} with a consumer.
