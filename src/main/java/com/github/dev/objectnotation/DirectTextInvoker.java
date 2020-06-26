@@ -6,9 +6,15 @@ import java.util.Objects;
 import java.util.function.IntConsumer;
 
 /**
- * Invoker
+ * Invoker provides static methods.
  */
 public final class DirectTextInvoker {
+
+	/**
+	 * Suppress default constructor, ensuring non-instantiability.
+	 */
+	private DirectTextInvoker() {
+	}
 
 	/**
 	 * Resolve text, output origin value.
