@@ -22,6 +22,10 @@ final class ValueReader implements IntToFunction {
 			return parser.backslashConverter;
 		} else if (c == '&') {
 			return parser.quoteValue;
+		} else if (c == '[') {
+			return parser.arrayReader;
+		} else if (c == '{') {
+			return parser.objectReader;
 		}
 		parser.valueConsumer.accept(i);
 		return this;
