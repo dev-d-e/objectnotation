@@ -1,18 +1,19 @@
 package com.github.dev.objectnotation;
 
 import java.util.Objects;
-import java.util.function.IntConsumer;
 
 /**
  * ValueParser.
  */
 final class ValueParser {
 
-	final IntConsumer valueConsumer;
+	final TypeConsumer valueConsumer;
 
 	final ValueReader valueReader = new ValueReader(this);
 	final BackslashConverter backslashConverter = new BackslashConverter(this);
 	final QuoteValueReader quoteValue = new QuoteValueReader(this);
+	final ArrayReader arrayReader = new ArrayReader(this);
+	final ObjectReader objectReader = new ObjectReader(this);
 	private IntToFunction currentFunction = valueReader;
 
 	/**
@@ -20,7 +21,7 @@ final class ValueParser {
 	 * 
 	 * @param valueConsumer the consumer of the value.
 	 */
-	ValueParser(IntConsumer valueConsumer) {
+	ValueParser(TypeConsumer valueConsumer) {
 		Objects.requireNonNull(valueConsumer);
 		this.valueConsumer = valueConsumer;
 	}
