@@ -13,6 +13,11 @@ final class BackslashConverter implements IntToFunction {
 
 	@Override
 	public IntToFunction apply(int i) {
+		if (i == -1) {
+			parser.valueConsumer.accept(-1);
+			return parser.valueReader;
+		}
+		parser.valueConsumer.accept(i);
 		return parser.valueReader;
 	}
 
