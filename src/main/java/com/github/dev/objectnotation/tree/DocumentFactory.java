@@ -9,7 +9,7 @@ import com.github.dev.objectnotation.value.Entity;
  */
 public class DocumentFactory {
 
-	private final Document document = new DocumentImpl();
+	private final DocumentImpl document = new DocumentImpl();
 	private Node last;
 
 	public Document getDocument() {
@@ -25,9 +25,6 @@ public class DocumentFactory {
 			Node node = new BranchNodeImpl(offset, key);
 			document.add(node);
 			last = node;
-			return;
-		}
-		if (last instanceof LeafNodeImpl) {
 			return;
 		}
 		Node node = new BranchNodeImpl(offset, key);
@@ -53,9 +50,6 @@ public class DocumentFactory {
 			last = node;
 			return;
 		}
-		if (last instanceof LeafNodeImpl) {
-			return;
-		}
 		Node node = new LeafNodeImpl(offset, key, entity);
 		if (offset == last.getOffset()) {
 			node.setParent(last.getParent());
@@ -64,6 +58,7 @@ public class DocumentFactory {
 			node.setParent(last);
 			last.add(node);
 		}
+		document.addMapping(node);
 		last = node;
 	}
 
