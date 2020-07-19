@@ -28,12 +28,19 @@ public class DocumentFactory {
 			return;
 		}
 		Node node = new BranchNodeImpl(offset, key);
-		if (offset == last.getOffset()) {
-			node.setParent(last.getParent());
-			last.getParent().add(node);
-		} else {
+		if (offset == (last.getOffset() + 1)) {
 			node.setParent(last);
 			last.add(node);
+		} else {
+			Node p = last;
+			while (p != null && offset != p.getOffset()) {
+				p = p.getParent();
+			}
+			if (p == null) {
+				return;
+			}
+			node.setParent(p.getParent());
+			p.getParent().add(node);
 		}
 		last = node;
 	}
@@ -51,12 +58,19 @@ public class DocumentFactory {
 			return;
 		}
 		Node node = new LeafNodeImpl(offset, key, entity);
-		if (offset == last.getOffset()) {
-			node.setParent(last.getParent());
-			last.getParent().add(node);
-		} else {
+		if (offset == (last.getOffset() + 1)) {
 			node.setParent(last);
 			last.add(node);
+		} else {
+			Node p = last;
+			while (p != null && offset != p.getOffset()) {
+				p = p.getParent();
+			}
+			if (p == null) {
+				return;
+			}
+			node.setParent(p.getParent());
+			p.getParent().add(node);
 		}
 		document.addMapping(node);
 		last = node;
