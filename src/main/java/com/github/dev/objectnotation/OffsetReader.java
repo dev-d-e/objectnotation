@@ -11,6 +11,8 @@ final class OffsetReader implements IntToFunction {
 
 	private int available = 1;
 
+	private boolean isChildAvailable = true;
+
 	private String offset = "0";
 
 	private int offsetNumber = -1;
@@ -40,11 +42,20 @@ final class OffsetReader implements IntToFunction {
 				throw new IllegalCharException(parser.getRow(), parser.n);
 			}
 			offsetNumber = Integer.parseInt(offset);
-			if (offsetNumber == 0 || offsetNumber == available) {
-				setChildAvailable();
-				return parser.key;
+			if (isChildAvailable) {
+				if (offsetNumber == 0 || offsetNumber == available) {
+					setChildAvailable();
+					return parser.key;
+				} else {
+					throw new IllegalCharException(parser.getRow(), parser.n);
+				}
 			} else {
-				throw new IllegalCharException(parser.getRow(), parser.n);
+				if (offsetNumber == 0 || offsetNumber <= available) {
+					setChildAvailable();
+					return parser.key;
+				} else {
+					throw new IllegalCharException(parser.getRow(), parser.n);
+				}
 			}
 		} else {
 			builder = new StringBuilder(Constants.OFFSET_MAX_LENGTH);
@@ -72,6 +83,7 @@ final class OffsetReader implements IntToFunction {
 	void setBrotherAvailable() {
 		if (available != offsetNumber) {
 			this.available = offsetNumber;
+			isChildAvailable = false;
 		}
 	}
 
@@ -80,6 +92,7 @@ final class OffsetReader implements IntToFunction {
 	 */
 	void setChildAvailable() {
 		this.available = offsetNumber + 1;
+		isChildAvailable = true;
 	}
 
 }
