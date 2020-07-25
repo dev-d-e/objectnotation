@@ -1,8 +1,20 @@
 package com.github.dev.objectnotation.html;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.dev.objectnotation.tree.Node;
 
+/**
+ * label
+ */
 class TagLabel extends TagAbstractImpl {
+
+	private static final Set<String> ATTRIBUTES = new HashSet<>();
+
+	static {
+		ATTRIBUTES.add("for");
+	}
 
 	protected TagLabel(Node node) {
 		super(node);
@@ -10,12 +22,7 @@ class TagLabel extends TagAbstractImpl {
 
 	@Override
 	protected boolean isAttribute(String str) {
-		return true;
-	}
-
-	@Override
-	protected Tag createTag(String str, Node node) {
-		return null;
+		return ATTRIBUTES.contains(str);
 	}
 
 }
