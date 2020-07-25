@@ -1,8 +1,26 @@
 package com.github.dev.objectnotation.html;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.dev.objectnotation.tree.Node;
 
+/**
+ * script
+ */
 class TagScript extends TagAbstractImpl {
+
+	private static final Set<String> ATTRIBUTES = new HashSet<>();
+
+	static {
+		ATTRIBUTES.add("src");
+		ATTRIBUTES.add("type");
+		ATTRIBUTES.add("async");
+		ATTRIBUTES.add("defer");
+		ATTRIBUTES.add("crossorigin");
+		ATTRIBUTES.add("integrity");
+		ATTRIBUTES.add("referrerpolicy");
+	}
 
 	protected TagScript(Node node) {
 		super(node);
@@ -10,12 +28,7 @@ class TagScript extends TagAbstractImpl {
 
 	@Override
 	protected boolean isAttribute(String str) {
-		return true;
-	}
-
-	@Override
-	protected Tag createTag(String str, Node node) {
-		return null;
+		return ATTRIBUTES.contains(str);
 	}
 
 }
