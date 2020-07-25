@@ -1,8 +1,20 @@
 package com.github.dev.objectnotation.html;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.dev.objectnotation.tree.Node;
 
+/**
+ * html
+ */
 class TagHtml extends TagAbstractImpl {
+
+	private static final Set<String> ATTRIBUTES = new HashSet<>();
+
+	static {
+		ATTRIBUTES.add("manifest");
+	}
 
 	protected TagHtml(Node node) {
 		super(node);
@@ -10,7 +22,7 @@ class TagHtml extends TagAbstractImpl {
 
 	@Override
 	protected boolean isAttribute(String str) {
-		return false;
+		return ATTRIBUTES.contains(str);
 	}
 
 	@Override
@@ -21,7 +33,7 @@ class TagHtml extends TagAbstractImpl {
 		case "body":
 			return new TagBody(node);
 		default:
-			return null;
+			return new TagCommon(node);
 		}
 	}
 
