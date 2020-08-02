@@ -23,47 +23,47 @@ class PrimitiveTypeEntityImpl implements PrimitiveTypeEntity {
 
 	@Override
 	public boolean booleanValue() {
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	@Override
 	public byte byteValue() {
-		return 0;
+		return Byte.parseByte(value);
 	}
 
 	@Override
 	public short shortValue() {
-		return 0;
+		return Short.parseShort(value);
 	}
 
 	@Override
 	public int intValue() {
-		return 0;
+		return Integer.parseInt(value);
 	}
 
 	@Override
 	public long longValue() {
-		return 0;
+		return Long.parseLong(value);
 	}
 
 	@Override
 	public float floatValue() {
-		return 0;
+		return Float.parseFloat(value);
 	}
 
 	@Override
 	public double doubleValue() {
-		return 0;
+		return Double.parseDouble(value);
 	}
 
 	@Override
 	public BigInteger bigIntegerValue() {
-		return null;
+		return new BigInteger(value);
 	}
 
 	@Override
 	public BigDecimal bigDecimalValue() {
-		return null;
+		return new BigDecimal(value);
 	}
 
 }
