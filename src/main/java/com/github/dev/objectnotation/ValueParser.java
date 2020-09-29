@@ -13,7 +13,6 @@ final class ValueParser {
 	final BackslashConverter backslashConverter = new BackslashConverter(this);
 	final QuoteValueReader quoteValue = new QuoteValueReader(this);
 	final ArrayReader arrayReader = new ArrayReader(this);
-	final ObjectReader objectReader = new ObjectReader(this);
 	private IntToFunction currentFunction = valueReader;
 
 	/**
