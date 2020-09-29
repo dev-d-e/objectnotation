@@ -25,9 +25,6 @@ final class ValueReader implements IntToFunction {
 		} else if (c == '[') {
 			parser.valueConsumer.opt(1);
 			return parser.arrayReader;
-		} else if (c == '{') {
-			parser.valueConsumer.opt(2);
-			return parser.objectReader;
 		}
 		parser.valueConsumer.accept(i);
 		return this;
