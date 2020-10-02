@@ -13,8 +13,4 @@ public class EntityFactory {
 		return new ArrayEntityImpl();
 	}
 
-	public static ObjectEntity createObjectEntity() {
-		return new ObjectEntityImpl();
-	}
-
 }
