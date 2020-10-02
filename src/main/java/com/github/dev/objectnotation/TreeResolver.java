@@ -6,7 +6,6 @@ import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.DocumentFactory;
 import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.EntityFactory;
-import com.github.dev.objectnotation.value.ObjectEntity;
 
 /**
  * Tree resolver.
@@ -50,7 +49,6 @@ class TreeResolver {
 		private int option = 0;
 		private StringProcessor stringProcessor = new StringProcessor();
 		private ArrayProcessor arrayProcessor = new ArrayProcessor();
-		private ObjectProcessor objectProcessor = new ObjectProcessor();
 		private IntConsumer intConsumer = stringProcessor;
 
 		@Override
@@ -63,8 +61,6 @@ class TreeResolver {
 				intConsumer = stringProcessor;
 			} else if (option == 1) {
 				intConsumer = arrayProcessor;
-			} else if (option == 2) {
-				intConsumer = objectProcessor;
 			}
 		}
 
@@ -117,45 +113,6 @@ class TreeResolver {
 					builder = new StringBuilder();
 				} else {
 					builder.append(c);
-				}
-			}
-		}
-
-	}
-
-	private class ObjectProcessor implements IntConsumer {
-
-		private ObjectEntity objectEntity = EntityFactory.createObjectEntity();
-		private StringBuilder kbuilder = new StringBuilder();
-		private StringBuilder vbuilder = new StringBuilder();
-		private boolean acceptk = true;
-
-		@Override
-		public void accept(int i) {
-			if (i == -1) {
-				if (kbuilder.length() > 0) {
-					objectEntity.set(kbuilder.toString(), EntityFactory.createPrimitiveTypeEntity(vbuilder.toString()));
-					kbuilder = new StringBuilder();
-					vbuilder = new StringBuilder();
-				}
-				documentFactory.addLeaf(curOffset, curKey, objectEntity);
-				objectEntity = EntityFactory.createObjectEntity();
-				valueConsumer.opt(0);
-			} else {
-				char c = (char) i;
-				if (c == ':') {
-					acceptk = false;
-				} else if (c == ';') {
-					objectEntity.set(kbuilder.toString(), EntityFactory.createPrimitiveTypeEntity(vbuilder.toString()));
-					kbuilder = new StringBuilder();
-					vbuilder = new StringBuilder();
-					acceptk = true;
-				} else {
-					if (acceptk) {
-						kbuilder.append(c);
-					} else {
-						vbuilder.append(c);
-					}
 				}
 			}
 		}
