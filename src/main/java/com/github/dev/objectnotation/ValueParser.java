@@ -9,11 +9,11 @@ final class ValueParser {
 
 	final TypeConsumer valueConsumer;
 
-	final ValueReader valueReader = new ValueReader(this);
-	final BackslashConverter backslashConverter = new BackslashConverter(this);
-	final QuoteValueReader quoteValue = new QuoteValueReader(this);
-	final ArrayReader arrayReader = new ArrayReader(this);
-	private IntToFunction currentFunction = valueReader;
+	final ParseValue value = new ParseValue(this);
+	final ParseBackslash backslash = new ParseBackslash(this);
+	final ParseQuote quote = new ParseQuote(this);
+	final ParseArray array = new ParseArray(this);
+	private IntToFunction currentFunction = value;
 
 	/**
 	 * Constructs a {@code ValueParser} with a consumer.
