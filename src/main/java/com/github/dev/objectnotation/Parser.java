@@ -21,11 +21,11 @@ final class Parser {
 	final IntStringConsumer keyConsumer;
 	final IntConsumer valueConsumer;
 
-	final HeaderReader header = new HeaderReader(this);
-	final OffsetReader offset = new OffsetReader(this);
-	final Key key = new Key(this);
-	final Value value = new Value(this);
-	final NextLineReader next = new NextLineReader(this);
+	final ParseHeader header = new ParseHeader(this);
+	final ParseOffset offset = new ParseOffset(this);
+	final ParseKey key = new ParseKey(this);
+	final ParseText text = new ParseText(this);
+	final ParseNextLine next = new ParseNextLine(this);
 	private IntToFunction currentFunction = header;
 
 	/**
