@@ -20,11 +20,12 @@ final class ParseValue implements IntToFunction {
 		char c = (char) i;
 		if (c == '\\') {
 			return parser.backslash;
-		} else if (c == '&') {
-			return parser.quote;
 		} else if (c == '[') {
 			parser.valueConsumer.opt(1);
 			return parser.array;
+		} else if (c == '&') {
+			parser.valueConsumer.opt(2);
+			return parser.quote;
 		}
 		parser.valueConsumer.accept(i);
 		return this;
