@@ -35,6 +35,11 @@ class LeafNodeImpl extends AbstractNode {
 		return null;
 	}
 
+	@Override
+	public int size() {
+		return 0;
+	}
+
 	/**
 	 * Returns null.
 	 */
