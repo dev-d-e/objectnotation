@@ -32,7 +32,7 @@ final class ParseKey implements IntToFunction {
 			}
 			parser.keyConsumer.accept(parser.offset.getOffsetNumber(), k);
 			return parser.text;
-		} else if (c == '\n' || c == '\r') {
+		} else if (c == '#' || c == '~' || c == '\n' || c == '\r') {
 			throw new IllegalCharException(parser.getRow(), parser.n);
 		} else {
 			builder.append(c);
