@@ -2,7 +2,9 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.Objects;
 
+import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.Entity;
+import com.github.dev.objectnotation.value.EntityFactory;
 
 /**
  * Document factory.
@@ -47,8 +49,19 @@ public class DocumentFactory {
 
 	public void addLeaf(int offset, String key, Entity entity) {
 		Objects.requireNonNull(key);
-		Objects.requireNonNull(entity);
 		if (offset < 0) {
+			return;
+		}
+		if (last.getOffset() == offset && last.getKey().equals(key)) {
+			Entity lastEntity = last.getEntity();
+			if (lastEntity instanceof ArrayEntity) {
+				((ArrayEntity) lastEntity).add(entity);
+			} else {
+				ArrayEntity arrayEntity = EntityFactory.createArrayEntity();
+				arrayEntity.add(lastEntity);
+				arrayEntity.add(entity);
+				last.setEntity(arrayEntity);
+			}
 			return;
 		}
 		if (offset == 0) {
