@@ -30,6 +30,11 @@ public interface Node extends Cloneable, Iterable<Node> {
 	Node[] toArray();
 
 	/**
+	 * Returns the number of child nodes.
+	 */
+	int size();
+
+	/**
 	 * Returns node at the specified index position.
 	 * 
 	 * @param index the index of the node.
