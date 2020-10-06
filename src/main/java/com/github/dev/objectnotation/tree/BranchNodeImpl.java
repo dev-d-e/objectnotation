@@ -32,6 +32,11 @@ class BranchNodeImpl extends AbstractNode {
 	}
 
 	@Override
+	public int size() {
+		return nodes.size();
+	}
+
+	@Override
 	public Node node(int index) {
 		Objects.checkIndex(index, nodes.size());
 		return nodes.get(index);
