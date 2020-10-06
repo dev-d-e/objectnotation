@@ -23,7 +23,11 @@ class ArrayEntityImpl implements ArrayEntity {
 
 	@Override
 	public ArrayEntity add(Entity entity) {
-		values.add(entity);
+		if (entity instanceof ArrayEntity) {
+			((ArrayEntity) entity).forEach(e -> values.add(e));
+		} else {
+			values.add(entity);
+		}
 		return this;
 	}
 
