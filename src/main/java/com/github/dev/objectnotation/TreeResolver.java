@@ -20,6 +20,7 @@ class TreeResolver {
 
 	private int curOffset = -1;
 	private String curKey;
+	private boolean negative;
 
 	public TreeResolver() {
 		staResolver = new StandardResolver(keyConsumer, valueConsumer);
@@ -40,6 +41,7 @@ class TreeResolver {
 		public void accept(int i, String s) {
 			curOffset = i;
 			curKey = s;
+			negative = false;
 		}
 
 	}
@@ -49,6 +51,7 @@ class TreeResolver {
 		private int option = 0;
 		private StringProcessor stringProcessor = new StringProcessor();
 		private ArrayProcessor arrayProcessor = new ArrayProcessor();
+		private QuoteProcessor quoteProcessor = new QuoteProcessor();
 		private IntConsumer intConsumer = stringProcessor;
 
 		@Override
@@ -61,6 +64,8 @@ class TreeResolver {
 				intConsumer = stringProcessor;
 			} else if (option == 1) {
 				intConsumer = arrayProcessor;
+			} else if (option == 2) {
+				intConsumer = quoteProcessor;
 			}
 		}
 
@@ -78,12 +83,16 @@ class TreeResolver {
 		@Override
 		public void accept(int i) {
 			if (i == -1) {
+				if (negative) {
+					return;
+				}
 				if (builder.length() > 0) {
 					documentFactory.addLeaf(curOffset, curKey, EntityFactory.createPrimitiveTypeEntity(builder.toString()));
 				} else {
 					documentFactory.addBranch(curOffset, curKey);
 				}
 				builder = new StringBuilder();
+				negative = true;
 			} else {
 				builder.append((char) i);
 			}
@@ -99,6 +108,9 @@ class TreeResolver {
 		@Override
 		public void accept(int i) {
 			if (i == -1) {
+				if (negative) {
+					return;
+				}
 				if (builder.length() > 0) {
 					arrayEntity.add(EntityFactory.createPrimitiveTypeEntity(builder.toString()));
 					builder = new StringBuilder();
@@ -106,6 +118,7 @@ class TreeResolver {
 				documentFactory.addLeaf(curOffset, curKey, arrayEntity);
 				arrayEntity = EntityFactory.createArrayEntity();
 				valueConsumer.opt(0);
+				negative = true;
 			} else {
 				char c = (char) i;
 				if (c == ',') {
@@ -115,6 +128,17 @@ class TreeResolver {
 					builder.append(c);
 				}
 			}
+		}
+
+	}
+
+	private class QuoteProcessor implements IntConsumer {
+
+		private StringBuilder builder = new StringBuilder();
+
+		@Override
+		public void accept(int i) {
+			
 		}
 
 	}
