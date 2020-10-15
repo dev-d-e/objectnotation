@@ -18,7 +18,6 @@ final class ParseQuote implements IntToFunction {
 			throw new IllegalCharException("illegal char in quote.");
 		} else if (c == ' ') {
 			parser.valueConsumer.accept(-1);
-			parser.valueConsumer.opt(0);
 			return parser.value;
 		}
 		parser.valueConsumer.accept(i);
