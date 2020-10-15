@@ -16,9 +16,9 @@ public interface PrimitiveTypeEntity extends Entity {
 	/**
 	 * Set value.
 	 * 
-	 * @param value the text.
+	 * @param cs the char sequence.
 	 */
-	PrimitiveTypeEntity setValue(String value);
+	PrimitiveTypeEntity accept(CharSequence cs);
 
 	/**
 	 * Returns boolean value literals 'true' and 'false'.
