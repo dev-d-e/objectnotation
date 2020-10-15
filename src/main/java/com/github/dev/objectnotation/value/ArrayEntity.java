@@ -6,6 +6,11 @@ package com.github.dev.objectnotation.value;
 public interface ArrayEntity extends Entity, Iterable<Entity> {
 
 	/**
+	 * Returns the number of entities.
+	 */
+	int size();
+
+	/**
 	 * Returns all entities.
 	 */
 	Entity[] toArray();
