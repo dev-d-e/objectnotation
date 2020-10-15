@@ -1,10 +1,8 @@
 package com.github.dev.objectnotation;
 
-import java.util.function.IntConsumer;
-
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.DocumentFactory;
-import com.github.dev.objectnotation.value.ArrayEntity;
+import com.github.dev.objectnotation.value.Entity;
 import com.github.dev.objectnotation.value.EntityFactory;
 
 /**
@@ -48,37 +46,12 @@ class TreeResolver {
 
 	private class ValueConsumer implements TypeConsumer {
 
-		private int option = 0;
-		private StringProcessor stringProcessor = new StringProcessor();
-		private ArrayProcessor arrayProcessor = new ArrayProcessor();
-		private QuoteProcessor quoteProcessor = new QuoteProcessor();
-		private IntConsumer intConsumer = stringProcessor;
+		private Entity entity = EntityFactory.createPrimitiveTypeEntity();
 
 		@Override
-		public void opt(int i) {
-			if (curOffset == -1) {
-				throw new IllegalCharException("");
-			}
-			option = i;
-			if (option == 0) {
-				intConsumer = stringProcessor;
-			} else if (option == 1) {
-				intConsumer = arrayProcessor;
-			} else if (option == 2) {
-				intConsumer = quoteProcessor;
-			}
+		public void setEntity(Entity entity) {
+			this.entity = entity;
 		}
-
-		@Override
-		public void accept(int i) {
-			intConsumer.accept(i);
-		}
-
-	}
-
-	private class StringProcessor implements IntConsumer {
-
-		private StringBuilder builder = new StringBuilder();
 
 		@Override
 		public void accept(int i) {
@@ -86,59 +59,17 @@ class TreeResolver {
 				if (negative) {
 					return;
 				}
-				if (builder.length() > 0) {
-					documentFactory.addLeaf(curOffset, curKey, EntityFactory.createPrimitiveTypeEntity(builder.toString()));
-				} else {
+				entity.finish();
+				if (entity.isEmpty()) {
 					documentFactory.addBranch(curOffset, curKey);
-				}
-				builder = new StringBuilder();
-				negative = true;
-			} else {
-				builder.append((char) i);
-			}
-		}
-
-	}
-
-	private class ArrayProcessor implements IntConsumer {
-
-		private ArrayEntity arrayEntity = EntityFactory.createArrayEntity();
-		private StringBuilder builder = new StringBuilder();
-
-		@Override
-		public void accept(int i) {
-			if (i == -1) {
-				if (negative) {
-					return;
-				}
-				if (builder.length() > 0) {
-					arrayEntity.add(EntityFactory.createPrimitiveTypeEntity(builder.toString()));
-					builder = new StringBuilder();
-				}
-				documentFactory.addLeaf(curOffset, curKey, arrayEntity);
-				arrayEntity = EntityFactory.createArrayEntity();
-				valueConsumer.opt(0);
-				negative = true;
-			} else {
-				char c = (char) i;
-				if (c == ',') {
-					arrayEntity.add(EntityFactory.createPrimitiveTypeEntity(builder.toString()));
-					builder = new StringBuilder();
 				} else {
-					builder.append(c);
+					documentFactory.addEntity(curOffset, curKey, entity);
 				}
+				entity = EntityFactory.createPrimitiveTypeEntity();
+				negative = true;
+			} else {
+				entity.accept((char) i);
 			}
-		}
-
-	}
-
-	private class QuoteProcessor implements IntConsumer {
-
-		private StringBuilder builder = new StringBuilder();
-
-		@Override
-		public void accept(int i) {
-			
 		}
 
 	}
