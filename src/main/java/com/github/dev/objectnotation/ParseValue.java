@@ -1,5 +1,7 @@
 package com.github.dev.objectnotation;
 
+import com.github.dev.objectnotation.value.EntityFactory;
+
 /**
  * Parse value.
  */
@@ -21,10 +23,10 @@ final class ParseValue implements IntToFunction {
 		if (c == '\\') {
 			return parser.backslash;
 		} else if (c == '[') {
-			parser.valueConsumer.opt(1);
+			parser.valueConsumer.setEntity(EntityFactory.createArrayEntity());
 			return parser.array;
 		} else if (c == '&') {
-			parser.valueConsumer.opt(2);
+			parser.valueConsumer.setEntity(EntityFactory.createQuoteEntity());
 			return parser.quote;
 		}
 		parser.valueConsumer.accept(i);
