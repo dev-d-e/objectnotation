@@ -10,14 +10,32 @@ class PrimitiveTypeEntityImpl implements PrimitiveTypeEntity {
 
 	private String value;
 
+	private StringBuilder builder = new StringBuilder();
+
+	@Override
+	public PrimitiveTypeEntity accept(char c) {
+		builder.append(c);
+		return this;
+	}
+
+	@Override
+	public void finish() {
+		value = builder.toString();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return value == null || value.isEmpty();
+	}
+
 	@Override
 	public String getValue() {
 		return value;
 	}
 
 	@Override
-	public PrimitiveTypeEntity setValue(String value) {
-		this.value = value;
+	public PrimitiveTypeEntity accept(CharSequence cs) {
+		builder.append(cs);
 		return this;
 	}
 
