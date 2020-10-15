@@ -5,12 +5,16 @@ package com.github.dev.objectnotation.value;
  */
 public class EntityFactory {
 
-	public static PrimitiveTypeEntity createPrimitiveTypeEntity(String str) {
-		return new PrimitiveTypeEntityImpl().setValue(str);
+	public static PrimitiveTypeEntity createPrimitiveTypeEntity() {
+		return new PrimitiveTypeEntityImpl();
 	}
 
 	public static ArrayEntity createArrayEntity() {
 		return new ArrayEntityImpl();
+	}
+
+	public static QuoteEntity createQuoteEntity() {
+		return new QuoteEntityImpl();
 	}
 
 }
