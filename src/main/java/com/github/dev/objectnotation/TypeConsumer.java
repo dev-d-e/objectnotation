@@ -1,11 +1,13 @@
 package com.github.dev.objectnotation;
 
+import com.github.dev.objectnotation.value.Entity;
+
 /**
  * Type consumer.
  */
 interface TypeConsumer {
 
-	void opt(int i);
+	void setEntity(Entity entity);
 
 	/**
 	 * Performs this operation on the given argument.
