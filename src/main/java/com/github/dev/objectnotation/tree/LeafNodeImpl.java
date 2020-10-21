@@ -2,7 +2,9 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.Iterator;
 
+import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.Entity;
+import com.github.dev.objectnotation.value.EntityFactory;
 
 /**
  * Leaf node.
@@ -14,6 +16,9 @@ class LeafNodeImpl extends AbstractNode {
 		setEntity(entity);
 	}
 
+	/**
+	 * Returns false.
+	 */
 	@Override
 	public boolean isBranch() {
 		return false;
@@ -35,6 +40,9 @@ class LeafNodeImpl extends AbstractNode {
 		return null;
 	}
 
+	/**
+	 * Returns 0.
+	 */
 	@Override
 	public int size() {
 		return 0;
@@ -54,6 +62,24 @@ class LeafNodeImpl extends AbstractNode {
 	@Override
 	public Node add(Node node) {
 		return null;
+	}
+
+	@Override
+	public Node addEntity(Entity entity) {
+		Entity e = getEntity();
+		if (e == null) {
+			setEntity(entity);
+		} else {
+			if (e instanceof ArrayEntity) {
+				((ArrayEntity) e).add(entity);
+			} else {
+				ArrayEntity arrayEntity = EntityFactory.createArrayEntity();
+				arrayEntity.add(e);
+				arrayEntity.add(entity);
+				setEntity(arrayEntity);
+			}
+		}
+		return this;
 	}
 
 }
