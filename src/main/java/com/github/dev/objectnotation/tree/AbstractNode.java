@@ -43,6 +43,17 @@ abstract class AbstractNode implements Node {
 	}
 
 	@Override
+	public Node getNodeByOffset(int seekoffset) {
+		if (this.offset == seekoffset) {
+			return this;
+		}
+		if (seekoffset > 0 && seekoffset < this.offset) {
+			return getParent().getNodeByOffset(seekoffset);
+		}
+		return null;
+	}
+
+	@Override
 	public String getKey() {
 		return key;
 	}
