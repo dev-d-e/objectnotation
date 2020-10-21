@@ -2,12 +2,11 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import com.github.dev.objectnotation.value.Entity;
 
 /**
  * DocumentImpl.
@@ -28,11 +27,6 @@ class DocumentImpl implements Document {
 	 * Trees.
 	 */
 	private final List<Node> nodes = new ArrayList<>();
-
-	/**
-	 * Mapped entities.
-	 */
-	private final Map<String, Entity> mappedEntities = new LinkedHashMap<>();
 
 	@Override
 	public Map<String, String> configuration() {
@@ -68,30 +62,30 @@ class DocumentImpl implements Document {
 	@Override
 	public Document add(Node node) {
 		nodes.add(node);
-		if (!node.isBranch()) {
-			mappedEntities.put(node.getKey(), node.getEntity());
-		}
 		return this;
 	}
 
 	@Override
-	public Map<String, Entity> mappedEntities() {
-		return Collections.unmodifiableMap(mappedEntities);
+	public Node getNode(String str) {
+		if (str == null) {
+			return null;
+		}
+		return getNode(nodes.iterator(), str.split("\\."), 0);
 	}
 
-	public Document addMapping(Node node) {
-		if (node.isBranch()) {
-			return this;
+	private Node getNode(Iterator<Node> nodes, String[] keys, int index) {
+		while (nodes.hasNext()) {
+			Node node = nodes.next();
+			if (node.getKey().equals(keys[index])) {
+				index++;
+				if (keys.length > index) {
+					return getNode(node.iterator(), keys, index);
+				} else {
+					return node;
+				}
+			}
 		}
-		StringBuilder builder = new StringBuilder(node.getKey());
-		Node p = node.getParent();
-		while (p != null) {
-			builder.insert(0, '.');
-			builder.insert(0, p.getKey());
-			p = p.getParent();
-		}
-		mappedEntities.put(builder.toString(), node.getEntity());
-		return this;
+		return null;
 	}
 
 }
