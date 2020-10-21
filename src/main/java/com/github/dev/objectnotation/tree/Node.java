@@ -54,6 +54,13 @@ public interface Node extends Cloneable, Iterable<Node> {
 	int getOffset();
 
 	/**
+	 * Returns node at the specified offset in ancestors.
+	 * 
+	 * @param node a node.
+	 */
+	Node getNodeByOffset(int seekoffset);
+
+	/**
 	 * Returns key.
 	 */
 	String getKey();
@@ -70,5 +77,12 @@ public interface Node extends Cloneable, Iterable<Node> {
 	 * @param entity the entity.
 	 */
 	Node setEntity(Entity entity);
+
+	/**
+	 * Add entity.
+	 * 
+	 * @param entity the entity.
+	 */
+	Node addEntity(Entity entity);
 
 }
