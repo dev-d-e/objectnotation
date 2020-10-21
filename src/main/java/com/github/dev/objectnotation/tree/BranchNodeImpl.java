@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import com.github.dev.objectnotation.value.Entity;
+
 /**
  * Branch node.
  */
@@ -45,7 +47,16 @@ class BranchNodeImpl extends AbstractNode {
 	@Override
 	public Node add(Node node) {
 		nodes.add(node);
+		node.setParent(this);
 		return this;
+	}
+
+	/**
+	 * Do not add.
+	 */
+	@Override
+	public Node addEntity(Entity entity) {
+		return null;
 	}
 
 }
