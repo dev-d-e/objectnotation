@@ -18,6 +18,7 @@ class TreeResolver {
 
 	private int curOffset = -1;
 	private String curKey;
+	private Entity curEntity = EntityFactory.createPrimitiveTypeEntity();
 	private boolean negative;
 
 	public TreeResolver() {
@@ -46,11 +47,9 @@ class TreeResolver {
 
 	private class ValueConsumer implements TypeConsumer {
 
-		private Entity entity = EntityFactory.createPrimitiveTypeEntity();
-
 		@Override
 		public void setEntity(Entity entity) {
-			this.entity = entity;
+			curEntity = entity;
 		}
 
 		@Override
@@ -59,16 +58,12 @@ class TreeResolver {
 				if (negative) {
 					return;
 				}
-				entity.finish();
-				if (entity.isEmpty()) {
-					documentFactory.addBranch(curOffset, curKey);
-				} else {
-					documentFactory.addEntity(curOffset, curKey, entity);
-				}
-				entity = EntityFactory.createPrimitiveTypeEntity();
+				curEntity.finish();
+				documentFactory.addNode(curOffset, curKey, curEntity);
+				curEntity = EntityFactory.createPrimitiveTypeEntity();
 				negative = true;
 			} else {
-				entity.accept((char) i);
+				curEntity.accept((char) i);
 			}
 		}
 
