@@ -6,6 +6,7 @@ import com.github.dev.objectnotation.DirectTextInvoker;
 import com.github.dev.objectnotation.IntStringConsumer;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.DocumentFactory;
+import com.github.dev.objectnotation.value.Entity;
 import com.github.dev.objectnotation.value.EntityFactory;
 
 /**
@@ -18,6 +19,7 @@ class DocumentResolver {
 
 	private int curOffset = -1;
 	private String curKey;
+	private Entity curEntity = EntityFactory.createPrimitiveTypeEntity();
 
 	private Document document;
 
@@ -45,19 +47,14 @@ class DocumentResolver {
 
 	private class ValueConsumer implements IntConsumer {
 
-		private StringBuilder builder = new StringBuilder();
-
 		@Override
 		public void accept(int i) {
 			if (i == -1) {
-				if (builder.length() > 0) {
-					documentFactory.addLeaf(curOffset, curKey, EntityFactory.createPrimitiveTypeEntity(builder.toString()));
-				} else {
-					documentFactory.addBranch(curOffset, curKey);
-				}
-				builder = new StringBuilder();
+				curEntity.finish();
+				documentFactory.addNode(curOffset, curKey, curEntity);
+				curEntity = EntityFactory.createPrimitiveTypeEntity();
 			} else {
-				builder.append((char) i);
+				curEntity.accept((char) i);
 			}
 		}
 
