@@ -2,8 +2,6 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.Map;
 
-import com.github.dev.objectnotation.value.Entity;
-
 /**
  * Document.
  */
@@ -39,8 +37,10 @@ public interface Document {
 	Document add(Node node);
 
 	/**
-	 * Returns all mapped entities.
+	 * Returns node at a series of keys.
+	 * 
+	 * @param str some keys.
 	 */
-	Map<String, Entity> mappedEntities();
+	Node getNode(String str);
 
 }
