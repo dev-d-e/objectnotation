@@ -10,8 +10,6 @@ import com.github.dev.objectnotation.value.EntityFactory;
  */
 class TreeResolver {
 
-	private final IntStringConsumer keyConsumer = new KeyConsumer();
-	private final TypeConsumer valueConsumer = new ValueConsumer();
 	private final StandardResolver staResolver;
 
 	private final DocumentFactory documentFactory;
@@ -22,7 +20,33 @@ class TreeResolver {
 	private boolean negative;
 
 	public TreeResolver() {
-		staResolver = new StandardResolver(keyConsumer, valueConsumer);
+		staResolver = new StandardResolver((i, s) -> {
+			curOffset = i;
+			curKey = s;
+			negative = false;
+		}, new TypeConsumer() {
+
+			@Override
+			public void setEntity(Entity entity) {
+				curEntity = entity;
+			}
+
+			@Override
+			public void accept(int i) {
+				if (i == -1) {
+					if (negative) {
+						return;
+					}
+					curEntity.finish();
+					documentFactory.addNode(curOffset, curKey, curEntity);
+					curEntity = EntityFactory.createPrimitiveTypeEntity();
+					negative = true;
+				} else {
+					curEntity.accept((char) i);
+				}
+			}
+
+		});
 		documentFactory = new DocumentFactory();
 	}
 
@@ -32,41 +56,6 @@ class TreeResolver {
 
 	public Document getDocument() {
 		return documentFactory.getDocument();
-	}
-
-	private class KeyConsumer implements IntStringConsumer {
-
-		@Override
-		public void accept(int i, String s) {
-			curOffset = i;
-			curKey = s;
-			negative = false;
-		}
-
-	}
-
-	private class ValueConsumer implements TypeConsumer {
-
-		@Override
-		public void setEntity(Entity entity) {
-			curEntity = entity;
-		}
-
-		@Override
-		public void accept(int i) {
-			if (i == -1) {
-				if (negative) {
-					return;
-				}
-				curEntity.finish();
-				documentFactory.addNode(curOffset, curKey, curEntity);
-				curEntity = EntityFactory.createPrimitiveTypeEntity();
-				negative = true;
-			} else {
-				curEntity.accept((char) i);
-			}
-		}
-
 	}
 
 }
