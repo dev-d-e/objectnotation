@@ -3,7 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.function.IntConsumer;
 
 import com.github.dev.objectnotation.DirectTextInvoker;
-import com.github.dev.objectnotation.IntStringConsumer;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.DocumentFactory;
 import com.github.dev.objectnotation.value.Entity;
@@ -30,34 +29,25 @@ class DocumentResolver {
 
 	public Document getDocument() {
 		if (document == null) {
-			DirectTextInvoker.accept(charSequence, new KeyConsumer(), new ValueConsumer());
+			DirectTextInvoker.accept(charSequence, (i, s) -> {
+				curOffset = i;
+				curKey = s;
+			}, new IntConsumer() {
+
+				@Override
+				public void accept(int i) {
+					if (i == -1) {
+						curEntity.finish();
+						documentFactory.addNode(curOffset, curKey, curEntity);
+						curEntity = EntityFactory.createPrimitiveTypeEntity();
+					} else {
+						curEntity.accept((char) i);
+					}
+				}
+
+			});
 		}
 		return documentFactory.getDocument();
-	}
-
-	private class KeyConsumer implements IntStringConsumer {
-
-		@Override
-		public void accept(int i, String s) {
-			curOffset = i;
-			curKey = s;
-		}
-
-	}
-
-	private class ValueConsumer implements IntConsumer {
-
-		@Override
-		public void accept(int i) {
-			if (i == -1) {
-				curEntity.finish();
-				documentFactory.addNode(curOffset, curKey, curEntity);
-				curEntity = EntityFactory.createPrimitiveTypeEntity();
-			} else {
-				curEntity.accept((char) i);
-			}
-		}
-
 	}
 
 }
