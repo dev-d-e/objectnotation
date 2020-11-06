@@ -1,13 +1,18 @@
 package com.github.dev.objectnotation;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+
+import com.github.dev.objectnotation.value.Entity;
 
 /**
  * ValueParser.
  */
 final class ValueParser {
 
-	final TypeConsumer valueConsumer;
+	final Consumer<Entity> entityConsumer;
+	final IntConsumer valueConsumer;
 
 	final ParseValue value = new ParseValue(this);
 	final ParseBackslash backslash = new ParseBackslash(this);
@@ -16,12 +21,15 @@ final class ValueParser {
 	private IntToFunction currentFunction = value;
 
 	/**
-	 * Constructs a {@code ValueParser} with a consumer.
+	 * Constructs a {@code ValueParser} with two consumers.
 	 * 
-	 * @param valueConsumer the consumer of the value.
+	 * @param entityConsumer the consumer of the entity.
+	 * @param valueConsumer  the consumer of the value.
 	 */
-	ValueParser(TypeConsumer valueConsumer) {
+	ValueParser(Consumer<Entity> entityConsumer, IntConsumer valueConsumer) {
+		Objects.requireNonNull(entityConsumer);
 		Objects.requireNonNull(valueConsumer);
+		this.entityConsumer = entityConsumer;
 		this.valueConsumer = valueConsumer;
 	}
 
