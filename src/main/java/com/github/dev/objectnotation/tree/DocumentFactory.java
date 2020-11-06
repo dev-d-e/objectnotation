@@ -48,10 +48,6 @@ public class DocumentFactory {
 		if (offset < 0) {
 			return;
 		}
-		if (last.getOffset() == offset && last.getKey().equals(key)) {
-			last.addEntity(entity);
-			return;
-		}
 		add(offset, new LeafNodeImpl(offset, key, entity));
 	}
 
@@ -80,6 +76,14 @@ public class DocumentFactory {
 		} else {
 			addLeaf(offset, key, entity);
 		}
+	}
+
+	public boolean notEqualsLast(int offset, String key, Entity entity) {
+		if (last.getOffset() == offset && last.getKey().equals(key)) {
+			last.addEntity(entity);
+			return false;
+		}
+		return true;
 	}
 
 }
