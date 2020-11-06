@@ -28,12 +28,12 @@ public class ResolveTextInvoker {
 		if (array.length == 0) {
 			throw new NullPointerException();
 		}
-		TreeResolver treeResolver = new TreeResolver();
+		StandardResolver resolver = new StandardResolver();
 		for (int n = 0; n < array.length; n++) {
-			treeResolver.apply(array[n]);
+			resolver.apply(array[n]);
 		}
-		treeResolver.apply(-1);
-		return treeResolver.getDocument();
+		resolver.apply(-1);
+		return resolver.getDocument();
 	}
 
 	/**
@@ -47,10 +47,10 @@ public class ResolveTextInvoker {
 		if (charSequence.length() == 0) {
 			throw new NullPointerException();
 		}
-		TreeResolver treeResolver = new TreeResolver();
-		charSequence.chars().forEach(i -> treeResolver.apply(i));
-		treeResolver.apply(-1);
-		return treeResolver.getDocument();
+		StandardResolver resolver = new StandardResolver();
+		charSequence.chars().forEach(i -> resolver.apply(i));
+		resolver.apply(-1);
+		return resolver.getDocument();
 	}
 
 	/**
@@ -61,15 +61,15 @@ public class ResolveTextInvoker {
 	 */
 	public static Document accept(Reader reader) throws IOException {
 		Objects.requireNonNull(reader);
-		TreeResolver treeResolver = new TreeResolver();
+		StandardResolver resolver = new StandardResolver();
 		while (true) {
 			int i = reader.read();
-			treeResolver.apply(i);
+			resolver.apply(i);
 			if (i == -1) {
 				break;
 			}
 		}
-		return treeResolver.getDocument();
+		return resolver.getDocument();
 	}
 
 }
