@@ -23,10 +23,10 @@ final class ParseValue implements IntToFunction {
 		if (c == '\\') {
 			return parser.backslash;
 		} else if (c == '[') {
-			parser.valueConsumer.setEntity(EntityFactory.createArrayEntity());
+			parser.entityConsumer.accept(EntityFactory.createArrayEntity());
 			return parser.array;
 		} else if (c == '&') {
-			parser.valueConsumer.setEntity(EntityFactory.createQuoteEntity());
+			parser.entityConsumer.accept(EntityFactory.createQuoteEntity());
 			return parser.quote;
 		}
 		parser.valueConsumer.accept(i);
