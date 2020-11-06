@@ -1,5 +1,6 @@
 package com.github.dev.objectnotation.html;
 
+import com.github.dev.objectnotation.DirectTextInvoker;
 import com.github.dev.objectnotation.tree.Document;
 
 /**
@@ -8,7 +9,7 @@ import com.github.dev.objectnotation.tree.Document;
 public class HtmlConverter {
 
 	public static String convert(CharSequence charSequence) {
-		Document document = DocumentInvoker.accept(charSequence);
+		Document document = DirectTextInvoker.accept(charSequence);
 		TagHtml t = new TagHtml(document.node(0));
 		return t.asHtml();
 	}
