@@ -41,6 +41,6 @@ public interface Document {
 	 * 
 	 * @param str some keys.
 	 */
-	Node getNode(String str);
+	Node[] getNode(String str);
 
 }
