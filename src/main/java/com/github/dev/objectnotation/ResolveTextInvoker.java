@@ -18,7 +18,7 @@ public class ResolveTextInvoker {
 	}
 
 	/**
-	 * Resolve text, output Document.
+	 * Resolve text, output {@code Document}.
 	 *
 	 * @param array the text.
 	 * @return Document
@@ -37,7 +37,7 @@ public class ResolveTextInvoker {
 	}
 
 	/**
-	 * Resolve text, output Document.
+	 * Resolve text, output {@code Document}.
 	 *
 	 * @param charSequence the text.
 	 * @return Document
@@ -54,7 +54,7 @@ public class ResolveTextInvoker {
 	}
 
 	/**
-	 * Resolve text, output Document. the reader is not closed.
+	 * Resolve text, output {@code Document}. the reader is not closed.
 	 *
 	 * @param reader the text.
 	 * @return Document
@@ -70,6 +70,69 @@ public class ResolveTextInvoker {
 			}
 		}
 		return resolver.getDocument();
+	}
+
+	/**
+	 * Resolve text.
+	 *
+	 * @param array the text.
+	 * @param obj   the output.
+	 */
+	public static <T> void accept(char[] array, T obj) {
+		ObjectBuilder.build(accept(array), obj);
+	}
+
+	/**
+	 * Resolve text.
+	 *
+	 * @param array the text.
+	 * @param type  the class.
+	 * @return T
+	 */
+	public static <T> T accept(char[] array, Class<T> type) {
+		return ObjectBuilder.build(accept(array), type);
+	}
+
+	/**
+	 * Resolve text.
+	 *
+	 * @param charSequence the text.
+	 * @param obj          the output.
+	 */
+	public static <T> void accept(CharSequence charSequence, T obj) {
+		ObjectBuilder.build(accept(charSequence), obj);
+	}
+
+	/**
+	 * Resolve text.
+	 *
+	 * @param charSequence the text.
+	 * @param type         the class.
+	 * @return T
+	 */
+	public static <T> T accept(CharSequence charSequence, Class<T> type) {
+		return ObjectBuilder.build(accept(charSequence), type);
+	}
+
+	/**
+	 * Resolve text. the reader is not closed.
+	 *
+	 * @param reader the text.
+	 * @param obj    the output.
+	 */
+	public static <T> void accept(Reader reader, T obj) throws IOException {
+		ObjectBuilder.build(accept(reader), obj);
+	}
+
+	/**
+	 * Resolve text. the reader is not closed.
+	 *
+	 * @param reader the text.
+	 * @param type   the class.
+	 * @return T
+	 */
+	public static <T> T accept(Reader reader, Class<T> type) throws IOException {
+		return ObjectBuilder.build(accept(reader), type);
 	}
 
 }
