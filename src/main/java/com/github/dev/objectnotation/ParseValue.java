@@ -25,9 +25,6 @@ final class ParseValue implements IntToFunction {
 		} else if (c == '[') {
 			parser.entityConsumer.accept(EntityFactory.createArrayEntity());
 			return parser.array;
-		} else if (c == '&') {
-			parser.entityConsumer.accept(EntityFactory.createQuoteEntity());
-			return parser.quote;
 		}
 		parser.valueConsumer.accept(i);
 		return this;
