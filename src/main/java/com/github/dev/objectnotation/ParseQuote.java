@@ -13,13 +13,6 @@ final class ParseQuote implements IntToFunction {
 
 	@Override
 	public IntToFunction apply(int i) {
-		char c = (char) i;
-		if (c == '#' || c == '~' || c == '&' || c == '\n' || c == '\r' || c == '[' || c == ']') {
-			throw new IllegalCharException("illegal char in quote.");
-		} else if (c == ' ') {
-			parser.valueConsumer.accept(-1);
-			return parser.value;
-		}
 		parser.valueConsumer.accept(i);
 		return this;
 	}
