@@ -1,7 +1,5 @@
 package com.github.dev.objectnotation.tree;
 
-import java.util.Iterator;
-
 import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.Entity;
 import com.github.dev.objectnotation.value.EntityFactory;
@@ -9,59 +7,24 @@ import com.github.dev.objectnotation.value.EntityFactory;
 /**
  * Leaf node.
  */
-class LeafNodeImpl extends AbstractNode {
+class LeafNodeImpl extends AbstractNode implements LeafNode {
+
+	private Entity entity;
 
 	LeafNodeImpl(int offset, String key, Entity entity) {
 		super(offset, key);
 		setEntity(entity);
 	}
 
-	/**
-	 * Returns false.
-	 */
 	@Override
-	public boolean isBranch() {
-		return false;
+	public Entity getEntity() {
+		return entity;
 	}
 
-	/**
-	 * Returns null.
-	 */
 	@Override
-	public Iterator<Node> iterator() {
-		return null;
-	}
-
-	/**
-	 * Returns null.
-	 */
-	@Override
-	public Node[] toArray() {
-		return null;
-	}
-
-	/**
-	 * Returns 0.
-	 */
-	@Override
-	public int size() {
-		return 0;
-	}
-
-	/**
-	 * Returns null.
-	 */
-	@Override
-	public Node node(int index) {
-		return null;
-	}
-
-	/**
-	 * Do not add.
-	 */
-	@Override
-	public Node add(Node node) {
-		return null;
+	public Node setEntity(Entity entity) {
+		this.entity = entity;
+		return this;
 	}
 
 	@Override
