@@ -32,9 +32,7 @@ class StandardResolver {
 					return;
 				}
 				curEntity.finish();
-				if (documentFactory.notEqualsLast(curOffset, curKey, curEntity)) {
-					documentFactory.addNode(curOffset, curKey, curEntity);
-				}
+				documentFactory.addNode(curOffset, curKey, curEntity);
 				curEntity = EntityFactory.createPrimitiveTypeEntity();
 				negative = true;
 			} else {
