@@ -1,19 +1,15 @@
 package com.github.dev.objectnotation.tree;
 
-import com.github.dev.objectnotation.value.Entity;
-
 /**
  * Abstract class for {@code Node}.
  */
 abstract class AbstractNode implements Node {
 
-	private Node parent;
+	private BranchNode parent;
 
 	private int offset;
 
 	private String key;
-
-	private Entity entity;
 
 	/**
 	 * Constructor.
@@ -27,12 +23,12 @@ abstract class AbstractNode implements Node {
 	}
 
 	@Override
-	public Node getParent() {
+	public BranchNode getParent() {
 		return parent;
 	}
 
 	@Override
-	public Node setParent(Node node) {
+	public Node setParent(BranchNode node) {
 		this.parent = node;
 		return this;
 	}
@@ -56,17 +52,6 @@ abstract class AbstractNode implements Node {
 	@Override
 	public String getKey() {
 		return key;
-	}
-
-	@Override
-	public Entity getEntity() {
-		return entity;
-	}
-
-	@Override
-	public Node setEntity(Entity entity) {
-		this.entity = entity;
-		return this;
 	}
 
 }
