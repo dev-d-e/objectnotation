@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.dev.objectnotation.tree.BranchNode;
+import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
 import com.github.dev.objectnotation.value.Entity;
 import com.github.dev.objectnotation.value.PrimitiveTypeEntity;
@@ -25,8 +27,12 @@ abstract class TagAbstractImpl implements Tag {
 
 	protected TagAbstractImpl(Node node) {
 		name = node.getKey();
-		setNode(node.toArray());
-		setEntity(node.getEntity());
+		if (node instanceof BranchNode) {
+			setNode(((BranchNode) node).toArray());
+		}
+		if (node instanceof LeafNode) {
+			setEntity(((LeafNode) node).getEntity());
+		}
 	}
 
 	@Override
@@ -48,11 +54,11 @@ abstract class TagAbstractImpl implements Tag {
 		for (Node node : nodes) {
 			String k = node.getKey();
 			if (Attributes.isAttr(k.toLowerCase()) || isAttribute(k.toLowerCase())) {
-				Entity attributeValue = node.getEntity();
-				if (attributeValue != null && attributeValue instanceof PrimitiveTypeEntity) {
-					put(k, ((PrimitiveTypeEntity) attributeValue).getValue());
-				} else {
-					put(k, "");
+				if (node instanceof LeafNode) {
+					Entity attributeValue = ((LeafNode) node).getEntity();
+					if (attributeValue != null && attributeValue instanceof PrimitiveTypeEntity) {
+						put(k, ((PrimitiveTypeEntity) attributeValue).getValue());
+					}
 				}
 			} else {
 				Tag tag = createTag(k.toLowerCase(), node);
