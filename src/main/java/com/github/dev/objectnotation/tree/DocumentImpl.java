@@ -2,11 +2,11 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * DocumentImpl.
@@ -66,26 +66,21 @@ class DocumentImpl implements Document {
 	}
 
 	@Override
-	public Node getNode(String str) {
+	public Node[] getNode(String str) {
 		if (str == null) {
 			return null;
 		}
-		return getNode(nodes.iterator(), str.split("\\."), 0);
-	}
-
-	private Node getNode(Iterator<Node> nodes, String[] keys, int index) {
-		while (nodes.hasNext()) {
-			Node node = nodes.next();
-			if (node.getKey().equals(keys[index])) {
-				index++;
-				if (keys.length > index) {
-					return getNode(node.iterator(), keys, index);
-				} else {
-					return node;
-				}
+		String[] keys = str.split("\\.");
+		int n = keys.length - 1;
+		Stream<Node> st = nodes.stream();
+		for (int i = 0; i < keys.length; i++) {
+			String k = keys[i];
+			st = st.filter(o -> o.getKey().equals(k));
+			if (i < n) {
+				st = st.dropWhile(o -> !(o instanceof BranchNode)).flatMap(o -> ((BranchNode) o).stream());
 			}
 		}
-		return null;
+		return st.toArray(j -> new Node[j]);
 	}
 
 }
