@@ -4,23 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-
-import com.github.dev.objectnotation.value.Entity;
+import java.util.stream.Stream;
 
 /**
  * Branch node.
  */
-class BranchNodeImpl extends AbstractNode {
+class BranchNodeImpl extends AbstractNode implements BranchNode {
 
 	private List<Node> nodes = new ArrayList<>();
 
 	BranchNodeImpl(int offset, String key) {
 		super(offset, key);
-	}
-
-	@Override
-	public boolean isBranch() {
-		return true;
 	}
 
 	@Override
@@ -31,6 +25,11 @@ class BranchNodeImpl extends AbstractNode {
 	@Override
 	public Node[] toArray() {
 		return nodes.toArray(new Node[nodes.size()]);
+	}
+
+	@Override
+	public Stream<Node> stream() {
+		return nodes.stream();
 	}
 
 	@Override
@@ -45,18 +44,15 @@ class BranchNodeImpl extends AbstractNode {
 	}
 
 	@Override
-	public Node add(Node node) {
+	public BranchNode add(Node node) {
 		nodes.add(node);
 		node.setParent(this);
 		return this;
 	}
 
-	/**
-	 * Do not add.
-	 */
 	@Override
-	public Node addEntity(Entity entity) {
-		return null;
+	public Node[] node(String key) {
+		return stream().filter(o -> o.getKey().equals(key)).toArray(i -> new Node[i]);
 	}
 
 }
