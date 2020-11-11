@@ -5,24 +5,34 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.github.dev.objectnotation.ClassProperty.Property;
+import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
+import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
 import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.Entity;
 import com.github.dev.objectnotation.value.PrimitiveTypeEntity;
 
-public final class ObjectBuilder {
+final class ObjectBuilder {
 
-	public static <T> T build(Document document, T object) {
+	static <T> T build(Document document, T object) {
 		Objects.requireNonNull(object);
-		T o = buildForObject(document.nodes(), object);
-		return o;
+		return buildForObject(document.nodes(), object);
 	}
 
-	public static <T> T build(Document document, Class<T> type) {
+	static <T> T build(Document document, Class<T> type) {
 		Objects.requireNonNull(type);
-		T o = buildByClass(document.nodes(), type);
-		return o;
+		return buildByClass(document.nodes(), type);
+	}
+
+	static <T> T build(Node[] nodes, T object) {
+		Objects.requireNonNull(object);
+		return buildForObject(nodes, object);
+	}
+
+	static <T> T build(Node[] nodes, Class<T> type) {
+		Objects.requireNonNull(type);
+		return buildByClass(nodes, type);
 	}
 
 	private static <T> T buildByClass(Node[] nodes, Class<T> type) {
@@ -43,19 +53,19 @@ public final class ObjectBuilder {
 				continue;
 			}
 			Class<?> c = property.getType();
-			if (node.isBranch()) {
+			if (node instanceof BranchNode) {
+				Node[] childNodes = ((BranchNode) node).toArray();
 				if (c.isArray()) {
-					Object aa = buildByClass(node.toArray(), c.getComponentType());
-					property.setForArray(object, aa);
+					property.setForArray(object, buildByClass(childNodes, c.getComponentType()));
 				} else if (Collection.class.isAssignableFrom(c)) {
-					property.setForCollection(object, t -> buildByClass(node.toArray(), t));
+					property.setForCollection(object, t -> buildByClass(childNodes, t));
 				} else if (Map.class.isAssignableFrom(c)) {
-					property.setForMap(object, t -> buildByClass(node.toArray(), t));
+					property.setForMap(object, t -> buildByClass(childNodes, t));
 				} else {
-					property.setForBean(object, t -> buildByClass(node.toArray(), t), o -> buildForObject(node.toArray(), o));
+					property.setForBean(object, t -> buildByClass(childNodes, t), o -> buildForObject(childNodes, o));
 				}
-			} else {
-				Entity en = node.getEntity();
+			} else if (node instanceof LeafNode) {
+				Entity en = ((LeafNode) node).getEntity();
 				if (en == null) {
 					continue;
 				}
