@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * del
  */
@@ -17,12 +15,12 @@ class TagDel extends TagAbstractImpl {
 		ATTRIBUTES.add("datetime");
 	}
 
-	protected TagDel(Node node) {
-		super(node);
+	public TagDel() {
+		super("del");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
