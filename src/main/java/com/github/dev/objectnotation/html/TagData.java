@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * data
  */
@@ -16,12 +14,12 @@ class TagData extends TagAbstractImpl {
 		ATTRIBUTES.add("value");
 	}
 
-	protected TagData(Node node) {
-		super(node);
+	public TagData() {
+		super("data");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
