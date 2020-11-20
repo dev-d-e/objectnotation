@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * body
  */
@@ -31,12 +29,12 @@ class TagBody extends TagAbstractImpl {
 		ATTRIBUTES.add("onunload");
 	}
 
-	protected TagBody(Node node) {
-		super(node);
+	public TagBody() {
+		super("body");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
