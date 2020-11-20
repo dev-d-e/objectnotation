@@ -57,10 +57,6 @@ public class DocumentFactory {
 		if (offset < 0) {
 			return;
 		}
-		if (!isBranch && lastLeaf != null && lastLeaf.getOffset() == offset && lastLeaf.getKey().equals(key)) {
-			lastLeaf.addEntity(entity);
-			return;
-		}
 		LeafNode node = new LeafNodeImpl(offset, key, entity);
 		if (offset == 0) {
 			document.add(node);
