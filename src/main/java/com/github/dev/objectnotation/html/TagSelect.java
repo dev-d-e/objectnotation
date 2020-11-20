@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * select
  */
@@ -22,12 +20,12 @@ class TagSelect extends TagAbstractImpl {
 		ATTRIBUTES.add("size");
 	}
 
-	protected TagSelect(Node node) {
-		super(node);
+	public TagSelect() {
+		super("select");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
