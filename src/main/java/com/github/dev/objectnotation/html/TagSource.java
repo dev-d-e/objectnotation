@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * source
  */
@@ -20,12 +18,12 @@ class TagSource extends TagAbstractImpl {
 		ATTRIBUTES.add("media");
 	}
 
-	protected TagSource(Node node) {
-		super(node);
+	public TagSource() {
+		super("source");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
