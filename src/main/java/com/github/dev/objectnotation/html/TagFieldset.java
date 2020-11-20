@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * fieldset
  */
@@ -18,12 +16,12 @@ class TagFieldset extends TagAbstractImpl {
 		ATTRIBUTES.add("name");
 	}
 
-	protected TagFieldset(Node node) {
-		super(node);
+	public TagFieldset() {
+		super("fieldset");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
