@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * base
  */
@@ -17,12 +15,12 @@ class TagBase extends TagAbstractImpl {
 		ATTRIBUTES.add("target");
 	}
 
-	protected TagBase(Node node) {
-		super(node);
+	public TagBase() {
+		super("base");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
