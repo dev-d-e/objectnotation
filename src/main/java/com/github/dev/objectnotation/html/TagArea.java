@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * area
  */
@@ -24,12 +22,12 @@ class TagArea extends TagAbstractImpl {
 		ATTRIBUTES.add("referrerpolicy");
 	}
 
-	protected TagArea(Node node) {
-		super(node);
+	public TagArea() {
+		super("area");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
