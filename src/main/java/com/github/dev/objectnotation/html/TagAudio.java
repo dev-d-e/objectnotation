@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * audio
  */
@@ -22,12 +20,12 @@ class TagAudio extends TagAbstractImpl {
 		ATTRIBUTES.add("controls");
 	}
 
-	protected TagAudio(Node node) {
-		super(node);
+	public TagAudio() {
+		super("audio");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
