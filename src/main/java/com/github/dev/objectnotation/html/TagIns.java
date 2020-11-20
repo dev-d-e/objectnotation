@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * ins
  */
@@ -17,12 +15,12 @@ class TagIns extends TagAbstractImpl {
 		ATTRIBUTES.add("datetime");
 	}
 
-	protected TagIns(Node node) {
-		super(node);
+	public TagIns() {
+		super("ins");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
