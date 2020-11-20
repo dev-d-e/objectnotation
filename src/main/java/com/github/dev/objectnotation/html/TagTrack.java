@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * track
  */
@@ -20,12 +18,12 @@ class TagTrack extends TagAbstractImpl {
 		ATTRIBUTES.add("srclang");
 	}
 
-	protected TagTrack(Node node) {
-		super(node);
+	public TagTrack() {
+		super("track");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
