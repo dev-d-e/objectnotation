@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * meter
  */
@@ -21,12 +19,12 @@ class TagMeter extends TagAbstractImpl {
 		ATTRIBUTES.add("optimum");
 	}
 
-	protected TagMeter(Node node) {
-		super(node);
+	public TagMeter() {
+		super("meter");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
