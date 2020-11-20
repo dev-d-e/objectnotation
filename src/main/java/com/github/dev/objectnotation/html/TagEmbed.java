@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * embed
  */
@@ -19,12 +17,12 @@ class TagEmbed extends TagAbstractImpl {
 		ATTRIBUTES.add("height");
 	}
 
-	protected TagEmbed(Node node) {
-		super(node);
+	public TagEmbed() {
+		super("embed");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return true;
 	}
 
