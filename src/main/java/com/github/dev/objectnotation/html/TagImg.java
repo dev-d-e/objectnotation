@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * img
  */
@@ -27,12 +25,12 @@ class TagImg extends TagAbstractImpl {
 		ATTRIBUTES.add("loading");
 	}
 
-	protected TagImg(Node node) {
-		super(node);
+	public TagImg() {
+		super("img");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
