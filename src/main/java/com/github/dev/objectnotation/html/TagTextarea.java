@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * textarea
  */
@@ -27,12 +25,12 @@ class TagTextarea extends TagAbstractImpl {
 		ATTRIBUTES.add("wrap");
 	}
 
-	protected TagTextarea(Node node) {
-		super(node);
+	public TagTextarea() {
+		super("textarea");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
