@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * input
  */
@@ -45,12 +43,12 @@ class TagInput extends TagAbstractImpl {
 		ATTRIBUTES.add("width");
 	}
 
-	protected TagInput(Node node) {
-		super(node);
+	public TagInput() {
+		super("input");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
