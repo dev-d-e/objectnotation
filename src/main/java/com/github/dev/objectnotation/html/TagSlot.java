@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * slot
  */
@@ -16,12 +14,12 @@ class TagSlot extends TagAbstractImpl {
 		ATTRIBUTES.add("name");
 	}
 
-	protected TagSlot(Node node) {
-		super(node);
+	public TagSlot() {
+		super("slot");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
