@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * optgroup
  */
@@ -17,12 +15,12 @@ class TagOptgroup extends TagAbstractImpl {
 		ATTRIBUTES.add("label");
 	}
 
-	protected TagOptgroup(Node node) {
-		super(node);
+	public TagOptgroup() {
+		super("optgroup");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
