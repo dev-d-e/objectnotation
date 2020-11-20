@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * li
  */
@@ -16,12 +14,12 @@ class TagLi extends TagAbstractImpl {
 		ATTRIBUTES.add("value");
 	}
 
-	protected TagLi(Node node) {
-		super(node);
+	public TagLi() {
+		super("li");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
