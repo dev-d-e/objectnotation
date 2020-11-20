@@ -3,8 +3,6 @@ package com.github.dev.objectnotation.html;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * meta
  */
@@ -19,12 +17,12 @@ class TagMeta extends TagAbstractImpl {
 		ATTRIBUTES.add("charset");
 	}
 
-	protected TagMeta(Node node) {
-		super(node);
+	public TagMeta() {
+		super("meta");
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return ATTRIBUTES.contains(str);
 	}
 
