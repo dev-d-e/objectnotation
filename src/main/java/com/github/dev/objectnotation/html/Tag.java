@@ -2,9 +2,6 @@ package com.github.dev.objectnotation.html;
 
 import java.util.Map;
 
-import com.github.dev.objectnotation.tree.Node;
-import com.github.dev.objectnotation.value.Entity;
-
 /**
  * HTML Tag.
  */
@@ -16,24 +13,9 @@ interface Tag {
 	String getTagName();
 
 	/**
-	 * Set tag name.
-	 */
-	Tag setTagName(String tagName);
-
-	/**
-	 * Set all child nodes.
-	 */
-	Tag setNode(Node[] nodes);
-
-	/**
-	 * Set entity.
-	 */
-	Tag setEntity(Entity entity);
-
-	/**
 	 * Returns attribute.
 	 */
-	String getAttribute(String name);
+	String getAttribute(String attrName);
 
 	/**
 	 * Returns all attributes.
@@ -41,9 +23,29 @@ interface Tag {
 	Map<String, String> getAttributeMap();
 
 	/**
+	 * Set attribute.
+	 */
+	Tag setAttribute(String attrName, String attrValue);
+
+	/**
+	 * Returns true if it's a attribute.
+	 */
+	boolean isAttribute(String str);
+
+	/**
 	 * Returns tag value.
 	 */
 	String getTagValue();
+
+	/**
+	 * Set tag value.
+	 */
+	Tag setTagValue(String tagValue);
+
+	/**
+	 * Create a child tag.
+	 */
+	Tag createTag(String tagName);
 
 	/**
 	 * Returns all child tags.
