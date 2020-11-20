@@ -1,18 +1,16 @@
 package com.github.dev.objectnotation.html;
 
-import com.github.dev.objectnotation.tree.Node;
-
 /**
  * 
  */
 class TagCommon extends TagAbstractImpl {
 
-	protected TagCommon(Node node) {
-		super(node);
+	public TagCommon(String name) {
+		super(name);
 	}
 
 	@Override
-	protected boolean isAttribute(String str) {
+	public boolean isAttribute(String str) {
 		return false;
 	}
 
