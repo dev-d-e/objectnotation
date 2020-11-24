@@ -16,6 +16,11 @@ class ParseArray implements IntToFunction {
 		char c = (char) i;
 		if (c == '\r' || c == '\n') {
 			throw new IllegalCharException("illegal char in array.");
+		} else if (c == '[') {
+			return this;
+		} else if (c == ',') {
+			parser.valueConsumer.accept(-2);
+			return this;
 		} else if (c == ']') {
 			parser.valueConsumer.accept(-1);
 			return parser.value;
