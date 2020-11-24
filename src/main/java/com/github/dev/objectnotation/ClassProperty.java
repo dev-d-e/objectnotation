@@ -19,9 +19,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.Entity;
-import com.github.dev.objectnotation.value.PrimitiveTypeEntity;
 
 class ClassProperty {
 
@@ -108,7 +106,7 @@ class ClassProperty {
 			return false;
 		}
 
-		public boolean invokeWriteMethodByEntity(Object object, PrimitiveTypeEntity entity) {
+		public boolean invokeWriteMethodByEntity(Object object, Entity entity) {
 			if (writeMethod != null) {
 				try {
 					invokeWriteMethodByEntity0(object, entity);
@@ -120,7 +118,7 @@ class ClassProperty {
 			return false;
 		}
 
-		private void invokeWriteMethodByEntity0(Object object, PrimitiveTypeEntity entity) throws Exception {
+		private void invokeWriteMethodByEntity0(Object object, Entity entity) throws Exception {
 			if (boolean.class == type || Boolean.TYPE == type) {
 				writeMethod.invoke(object, entity.booleanValue());
 			} else if (byte.class == type || Byte.TYPE == type) {
@@ -146,7 +144,7 @@ class ClassProperty {
 			}
 		}
 
-		public void setForArrayByEntity(Object object, PrimitiveTypeEntity entity) {
+		public void setForArrayByEntity(Object object, Entity entity) {
 			Class<?> componentType = type.getComponentType();
 			if (boolean.class == componentType || Boolean.TYPE == componentType) {
 				setForArray(object, entity.booleanValue());
@@ -173,14 +171,6 @@ class ClassProperty {
 			}
 		}
 
-		public void setForArrayByEntity(Object object, ArrayEntity entity) {
-			for (Entity e : entity.toArray()) {
-				if (e instanceof PrimitiveTypeEntity) {
-					setForArrayByEntity(object, (PrimitiveTypeEntity) e);
-				}
-			}
-		}
-
 		public void setForArray(Object object, Object v) {
 			Object newArray = null;
 			Object srcArray = invokeReadMethod(object);
@@ -197,7 +187,7 @@ class ClassProperty {
 			invokeWriteMethod(object, newArray);
 		}
 
-		public void setForCollectionByEntity(Object object, PrimitiveTypeEntity entity) {
+		public void setForCollectionByEntity(Object object, Entity entity) {
 			Class<?> type = genericTypes0[0];
 			if (boolean.class == type || Boolean.TYPE == type) {
 				setForCollection(object, t -> entity.booleanValue());
@@ -221,14 +211,6 @@ class ClassProperty {
 				setForCollection(object, t -> entity.bigDecimalValue());
 			} else if (String.class == type) {
 				setForCollection(object, t -> entity.getValue());
-			}
-		}
-
-		public void setForCollectionByEntity(Object object, ArrayEntity entity) {
-			for (Entity e : entity.toArray()) {
-				if (e instanceof PrimitiveTypeEntity) {
-					setForCollectionByEntity(object, (PrimitiveTypeEntity) e);
-				}
 			}
 		}
 
