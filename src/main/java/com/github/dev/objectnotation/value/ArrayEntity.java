@@ -3,7 +3,7 @@ package com.github.dev.objectnotation.value;
 /**
  * Array entity.
  */
-public interface ArrayEntity extends Entity, Iterable<Entity> {
+public interface ArrayEntity extends Iterable<Entity> {
 
 	/**
 	 * Returns the number of entities.
