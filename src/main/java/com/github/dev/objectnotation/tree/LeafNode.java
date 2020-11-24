@@ -18,13 +18,6 @@ public interface LeafNode extends Node {
 	 * 
 	 * @param entity the entity.
 	 */
-	Node setEntity(Entity entity);
-
-	/**
-	 * Add entity.
-	 * 
-	 * @param entity the entity.
-	 */
-	Node addEntity(Entity entity);
+	LeafNode setEntity(Entity entity);
 
 }
