@@ -1,17 +1,13 @@
 package com.github.dev.objectnotation;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-
-import com.github.dev.objectnotation.value.Entity;
 
 /**
  * ValueParser.
  */
 final class ValueParser {
 
-	final Consumer<Entity> entityConsumer;
 	final IntConsumer valueConsumer;
 
 	final ParseValue value = new ParseValue(this);
@@ -26,10 +22,8 @@ final class ValueParser {
 	 * @param entityConsumer the consumer of the entity.
 	 * @param valueConsumer  the consumer of the value.
 	 */
-	ValueParser(Consumer<Entity> entityConsumer, IntConsumer valueConsumer) {
-		Objects.requireNonNull(entityConsumer);
+	ValueParser(IntConsumer valueConsumer) {
 		Objects.requireNonNull(valueConsumer);
-		this.entityConsumer = entityConsumer;
 		this.valueConsumer = valueConsumer;
 	}
 
