@@ -6,7 +6,6 @@ import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
 import com.github.dev.objectnotation.value.Entity;
-import com.github.dev.objectnotation.value.PrimitiveTypeEntity;
 
 /**
  * Converter.
@@ -53,15 +52,13 @@ public class HtmlConverter {
 		} else if (node instanceof LeafNode) {
 			Entity entity = ((LeafNode) node).getEntity();
 			if (Attributes.isAttr(k) || t.isAttribute(k)) {
-				if (entity != null && entity instanceof PrimitiveTypeEntity) {
-					t.setAttribute(k, ((PrimitiveTypeEntity) entity).getValue());
+				if (entity != null) {
+					t.setAttribute(k, entity.getValue());
 				}
 			} else {
 				Tag n = t.createTag(k);
 				if (entity != null) {
-					if (entity instanceof PrimitiveTypeEntity) {
-						n.setTagValue(((PrimitiveTypeEntity) entity).getValue());
-					}
+					n.setTagValue(entity.getValue());
 				}
 			}
 		}
