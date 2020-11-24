@@ -4,8 +4,6 @@ import java.util.function.IntConsumer;
 
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.DocumentFactory;
-import com.github.dev.objectnotation.value.Entity;
-import com.github.dev.objectnotation.value.EntityFactory;
 
 /**
  * Resolve key and value pair, output origin value.
@@ -18,8 +16,7 @@ final class EmptyResolver {
 
 	private int curOffset = -1;
 	private String curKey;
-	private Entity curEntity = EntityFactory.createPrimitiveTypeEntity();
-	private boolean negative;
+	private StringBuilder builder;
 
 	/**
 	 * Constructs a {@code Parser} with two consumers.
@@ -39,18 +36,15 @@ final class EmptyResolver {
 		parser = new Parser((i, s) -> {
 			curOffset = i;
 			curKey = s;
-			negative = false;
+			builder = new StringBuilder();
 		}, i -> {
-			if (i == -1) {
-				if (negative) {
-					return;
+			if (builder != null) {
+				if (i == -1) {
+					documentFactory.addNode(curOffset, curKey, builder);
+					builder = null;
+				} else {
+					builder.append((char) i);
 				}
-				curEntity.finish();
-				documentFactory.addNode(curOffset, curKey, curEntity);
-				curEntity = EntityFactory.createPrimitiveTypeEntity();
-				negative = true;
-			} else {
-				curEntity.accept((char) i);
 			}
 		});
 	}
