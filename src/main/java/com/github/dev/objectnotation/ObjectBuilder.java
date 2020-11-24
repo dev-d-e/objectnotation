@@ -9,9 +9,7 @@ import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
-import com.github.dev.objectnotation.value.ArrayEntity;
 import com.github.dev.objectnotation.value.Entity;
-import com.github.dev.objectnotation.value.PrimitiveTypeEntity;
 
 final class ObjectBuilder {
 
@@ -69,20 +67,12 @@ final class ObjectBuilder {
 				if (en == null) {
 					continue;
 				}
-				if (en instanceof PrimitiveTypeEntity) {
-					if (c.isArray()) {
-						property.setForArrayByEntity(object, (PrimitiveTypeEntity) en);
-					} else if (Collection.class.isAssignableFrom(c)) {
-						property.setForCollectionByEntity(object, (PrimitiveTypeEntity) en);
-					} else {
-						property.invokeWriteMethodByEntity(object, (PrimitiveTypeEntity) en);
-					}
-				} else if (en instanceof ArrayEntity) {
-					if (c.isArray()) {
-						property.setForArrayByEntity(object, (ArrayEntity) en);
-					} else if (Collection.class.isAssignableFrom(c)) {
-						property.setForCollectionByEntity(object, (ArrayEntity) en);
-					}
+				if (c.isArray()) {
+					property.setForArrayByEntity(object, en);
+				} else if (Collection.class.isAssignableFrom(c)) {
+					property.setForCollectionByEntity(object, en);
+				} else {
+					property.invokeWriteMethodByEntity(object, en);
 				}
 			}
 		}
