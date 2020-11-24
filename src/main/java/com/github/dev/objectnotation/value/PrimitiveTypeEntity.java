@@ -6,19 +6,7 @@ import java.math.BigInteger;
 /**
  * Primitive type entity.
  */
-public interface PrimitiveTypeEntity extends Entity {
-
-	/**
-	 * Returns value.
-	 */
-	String getValue();
-
-	/**
-	 * Set value.
-	 * 
-	 * @param cs the char sequence.
-	 */
-	PrimitiveTypeEntity accept(CharSequence cs);
+public interface PrimitiveTypeEntity {
 
 	/**
 	 * Returns boolean value literals 'true' and 'false'.
