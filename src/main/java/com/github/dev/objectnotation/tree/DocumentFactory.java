@@ -3,6 +3,7 @@ package com.github.dev.objectnotation.tree;
 import java.util.Objects;
 
 import com.github.dev.objectnotation.value.Entity;
+import com.github.dev.objectnotation.value.EntityFactory;
 
 /**
  * Document factory.
@@ -85,11 +86,11 @@ public class DocumentFactory {
 		isBranch = false;
 	}
 
-	public void addNode(int offset, String key, Entity entity) {
-		if (entity.isEmpty()) {
+	public void addNode(int offset, String key, CharSequence cs) {
+		if (cs == null || cs.length() == 0) {
 			addBranch(offset, key);
 		} else {
-			addLeaf(offset, key, entity);
+			addLeaf(offset, key, EntityFactory.createEntity(cs));
 		}
 	}
 
