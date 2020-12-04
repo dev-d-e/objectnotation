@@ -1,6 +1,7 @@
 package com.github.dev.objectnotation;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,17 +24,17 @@ final class ObjectBuilder {
 		return buildByClass(document.nodes(), type);
 	}
 
-	static <T> T build(Node[] nodes, T object) {
+	static <T> T build(List<Node> nodes, T object) {
 		Objects.requireNonNull(object);
 		return buildForObject(nodes, object);
 	}
 
-	static <T> T build(Node[] nodes, Class<T> type) {
+	static <T> T build(List<Node> nodes, Class<T> type) {
 		Objects.requireNonNull(type);
 		return buildByClass(nodes, type);
 	}
 
-	private static <T> T buildByClass(Node[] nodes, Class<T> type) {
+	private static <T> T buildByClass(List<Node> nodes, Class<T> type) {
 		try {
 			T o = type.getDeclaredConstructor().newInstance();
 			return buildForObject(nodes, o);
@@ -43,7 +44,7 @@ final class ObjectBuilder {
 		return null;
 	}
 
-	private static <T> T buildForObject(Node[] nodes, T object) {
+	private static <T> T buildForObject(List<Node> nodes, T object) {
 		ClassProperty p = new ClassProperty(object.getClass());
 		for (Node node : nodes) {
 			Property property = p.getProperty(node.getKey());
@@ -52,7 +53,7 @@ final class ObjectBuilder {
 			}
 			Class<?> c = property.getType();
 			if (node instanceof BranchNode) {
-				Node[] childNodes = ((BranchNode) node).toArray();
+				List<Node> childNodes = ((BranchNode) node).nodes();
 				if (c.isArray()) {
 					property.setForArray(object, buildByClass(childNodes, c.getComponentType()));
 				} else if (Collection.class.isAssignableFrom(c)) {
