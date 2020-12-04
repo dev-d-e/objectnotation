@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -39,8 +40,8 @@ class DocumentImpl implements Document {
 	}
 
 	@Override
-	public String[] externalResources() {
-		return externalResources.toArray(new String[externalResources.size()]);
+	public List<String> externalResources() {
+		return externalResources;
 	}
 
 	public Document externalResource(String str) {
@@ -49,8 +50,8 @@ class DocumentImpl implements Document {
 	}
 
 	@Override
-	public Node[] nodes() {
-		return nodes.toArray(new Node[nodes.size()]);
+	public List<Node> nodes() {
+		return nodes;
 	}
 
 	@Override
@@ -66,7 +67,7 @@ class DocumentImpl implements Document {
 	}
 
 	@Override
-	public Node[] getNode(String str) {
+	public List<Node> getNode(String str) {
 		if (str == null) {
 			return null;
 		}
@@ -77,10 +78,10 @@ class DocumentImpl implements Document {
 			String k = keys[i];
 			st = st.filter(o -> o.getKey().equals(k));
 			if (i < n) {
-				st = st.dropWhile(o -> !(o instanceof BranchNode)).flatMap(o -> ((BranchNode) o).stream());
+				st = st.filter(o -> o instanceof BranchNode).flatMap(o -> ((BranchNode) o).nodes().stream());
 			}
 		}
-		return st.toArray(j -> new Node[j]);
+		return st.collect(Collectors.toList());
 	}
 
 }
