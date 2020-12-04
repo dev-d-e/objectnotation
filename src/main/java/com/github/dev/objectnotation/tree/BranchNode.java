@@ -1,21 +1,16 @@
 package com.github.dev.objectnotation.tree;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * Branch node.
  */
-public interface BranchNode extends Node, Iterable<Node> {
+public interface BranchNode extends Node {
 
 	/**
 	 * Returns all child nodes.
 	 */
-	Node[] toArray();
-
-	/**
-	 * Returns a sequential {@code Stream} with all child nodes.
-	 */
-	Stream<Node> stream();
+	List<Node> nodes();
 
 	/**
 	 * Returns the number of child nodes.
@@ -41,6 +36,6 @@ public interface BranchNode extends Node, Iterable<Node> {
 	 * 
 	 * @param key the key of the node.
 	 */
-	Node[] node(String key);
+	List<Node> node(String key);
 
 }
