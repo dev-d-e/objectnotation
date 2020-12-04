@@ -22,12 +22,12 @@ final class Attributes {
 	private static final String ATTRIBUTE = "attribute";
 
 	public static boolean isAttr(String str) {
-		return Arrays.stream(GLOBALS).anyMatch(s -> s.equalsIgnoreCase(str)) || Arrays.stream(EVENT_HANDLER).anyMatch(s -> s.equalsIgnoreCase(str))
-				|| (str.length() >= 5 && str.substring(0, 5).equalsIgnoreCase(DATA));
+		str = str.toLowerCase();
+		return Arrays.stream(GLOBALS).anyMatch(str::equals) || Arrays.stream(EVENT_HANDLER).anyMatch(str::equals) || str.startsWith(DATA);
 	}
 
 	public static boolean containsAttr(String str) {
-		return ATTRIBUTE.equalsIgnoreCase(str);
+		return ATTRIBUTE.equals(str.toLowerCase());
 	}
 
 }
