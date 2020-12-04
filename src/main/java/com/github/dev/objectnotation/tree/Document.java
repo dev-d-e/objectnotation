@@ -1,5 +1,6 @@
 package com.github.dev.objectnotation.tree;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,14 +14,14 @@ public interface Document {
 	Map<String, String> configuration();
 
 	/**
-	 * Returns declared external resource array.
+	 * Returns declared external resource collection.
 	 */
-	String[] externalResources();
+	List<String> externalResources();
 
 	/**
 	 * Returns all root nodes.
 	 */
-	Node[] nodes();
+	List<Node> nodes();
 
 	/**
 	 * Returns node at the specified index position.
@@ -41,6 +42,6 @@ public interface Document {
 	 * 
 	 * @param str some keys.
 	 */
-	Node[] getNode(String str);
+	List<Node> getNode(String str);
 
 }
