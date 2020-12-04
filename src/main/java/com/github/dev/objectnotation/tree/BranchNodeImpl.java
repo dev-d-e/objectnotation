@@ -1,10 +1,9 @@
 package com.github.dev.objectnotation.tree;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * Branch node.
@@ -18,18 +17,8 @@ class BranchNodeImpl extends AbstractNode implements BranchNode {
 	}
 
 	@Override
-	public Iterator<Node> iterator() {
-		return nodes.iterator();
-	}
-
-	@Override
-	public Node[] toArray() {
-		return nodes.toArray(new Node[nodes.size()]);
-	}
-
-	@Override
-	public Stream<Node> stream() {
-		return nodes.stream();
+	public List<Node> nodes() {
+		return nodes;
 	}
 
 	@Override
@@ -51,8 +40,8 @@ class BranchNodeImpl extends AbstractNode implements BranchNode {
 	}
 
 	@Override
-	public Node[] node(String key) {
-		return stream().filter(o -> o.getKey().equals(key)).toArray(i -> new Node[i]);
+	public List<Node> node(String key) {
+		return nodes.stream().filter(o -> o.getKey().equals(key)).collect(Collectors.toList());
 	}
 
 }
