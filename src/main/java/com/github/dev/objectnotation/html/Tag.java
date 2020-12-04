@@ -1,5 +1,6 @@
 package com.github.dev.objectnotation.html;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,11 +29,6 @@ interface Tag {
 	Tag setAttribute(String attrName, String attrValue);
 
 	/**
-	 * Returns true if it's a attribute.
-	 */
-	boolean isAttribute(String str);
-
-	/**
 	 * Returns tag value.
 	 */
 	String getTagValue();
@@ -50,7 +46,7 @@ interface Tag {
 	/**
 	 * Returns all child tags.
 	 */
-	Tag[] toArray();
+	List<Tag> tags();
 
 	/**
 	 * Returns HTML String.
