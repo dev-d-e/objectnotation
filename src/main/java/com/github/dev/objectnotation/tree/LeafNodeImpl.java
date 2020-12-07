@@ -1,28 +1,35 @@
 package com.github.dev.objectnotation.tree;
 
-import com.github.dev.objectnotation.value.Entity;
+import java.util.Optional;
+
+import com.github.dev.objectnotation.TextTypeAdapter;
 
 /**
  * Leaf node.
  */
 class LeafNodeImpl extends AbstractNode implements LeafNode {
 
-	private Entity entity;
+	private String text;
 
-	LeafNodeImpl(int offset, String key, Entity entity) {
+	LeafNodeImpl(int offset, String key, CharSequence cs) {
 		super(offset, key);
-		setEntity(entity);
+		setText(cs);
 	}
 
 	@Override
-	public Entity getEntity() {
-		return entity;
-	}
-
-	@Override
-	public LeafNode setEntity(Entity entity) {
-		this.entity = entity;
+	public LeafNode setText(CharSequence cs) {
+		this.text = (cs == null ? null : cs.toString());
 		return this;
+	}
+
+	@Override
+	public Optional<String> getText() {
+		return Optional.ofNullable(text);
+	}
+
+	@Override
+	public TextTypeAdapter getTypeAdapter() {
+		return TextTypeAdapter.of(text);
 	}
 
 }
