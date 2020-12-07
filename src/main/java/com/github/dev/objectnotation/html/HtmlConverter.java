@@ -7,7 +7,6 @@ import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
-import com.github.dev.objectnotation.value.Entity;
 
 /**
  * Converter.
@@ -50,27 +49,18 @@ public class HtmlConverter {
 		String k = node.getKey();
 		if (node instanceof BranchNode) {
 			if (Attributes.containsAttr(k)) {
-				((BranchNode) node).nodes().stream().filter(o -> o instanceof LeafNode).map(o -> ((LeafNode) o)).forEach(o -> setAttribute(t, o.getKey(), o.getEntity()));
+				((BranchNode) node).nodes().stream().filter(o -> o instanceof LeafNode).map(o -> ((LeafNode) o)).forEach(o -> o.getText().ifPresent(s -> t.setAttribute(o.getKey(), s)));
 			} else {
 				Tag n = t.createTag(k);
 				((BranchNode) node).nodes().forEach(o -> fillTag(n, o));
 			}
 		} else if (node instanceof LeafNode) {
-			Entity entity = ((LeafNode) node).getEntity();
 			if (Attributes.isAttr(k) || ElementAttributes.isAttribute(t.getTagName(), k)) {
-				setAttribute(t, k, entity);
+				((LeafNode) node).getText().ifPresent(s -> t.setAttribute(k, s));
 			} else {
 				Tag n = t.createTag(k);
-				if (entity != null) {
-					n.setTagValue(entity.getValue());
-				}
+				((LeafNode) node).getText().ifPresent(s -> n.setTagValue(s));
 			}
-		}
-	}
-
-	private static void setAttribute(Tag t, String k, Entity entity) {
-		if (entity != null) {
-			t.setAttribute(k, entity.getValue());
 		}
 	}
 
