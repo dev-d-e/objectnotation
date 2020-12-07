@@ -1,6 +1,8 @@
 package com.github.dev.objectnotation.tree;
 
-import com.github.dev.objectnotation.value.Entity;
+import java.util.Optional;
+
+import com.github.dev.objectnotation.TextTypeAdapter;
 
 /**
  * Leaf node.
@@ -8,16 +10,20 @@ import com.github.dev.objectnotation.value.Entity;
 public interface LeafNode extends Node {
 
 	/**
-	 * Returns entity.
+	 * Set text.
 	 * 
+	 * @param text the text.
 	 */
-	Entity getEntity();
+	LeafNode setText(CharSequence cs);
 
 	/**
-	 * Set entity.
-	 * 
-	 * @param entity the entity.
+	 * Returns text.
 	 */
-	LeafNode setEntity(Entity entity);
+	Optional<String> getText();
+
+	/**
+	 * Returns text's type adapter.
+	 */
+	TextTypeAdapter getTypeAdapter();
 
 }
