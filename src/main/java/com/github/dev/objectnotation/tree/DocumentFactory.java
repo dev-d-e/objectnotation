@@ -2,9 +2,6 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.Objects;
 
-import com.github.dev.objectnotation.value.Entity;
-import com.github.dev.objectnotation.value.EntityFactory;
-
 /**
  * Document factory.
  */
@@ -53,12 +50,12 @@ public class DocumentFactory {
 		isBranch = true;
 	}
 
-	private void addLeaf(int offset, String key, Entity entity) {
+	private void addLeaf(int offset, String key, CharSequence cs) {
 		Objects.requireNonNull(key);
 		if (offset < 0) {
 			return;
 		}
-		LeafNode node = new LeafNodeImpl(offset, key, entity);
+		LeafNode node = new LeafNodeImpl(offset, key, cs);
 		if (offset == 0) {
 			document.add(node);
 			lastLeaf = node;
@@ -90,7 +87,7 @@ public class DocumentFactory {
 		if (cs == null || cs.length() == 0) {
 			addBranch(offset, key);
 		} else {
-			addLeaf(offset, key, EntityFactory.createEntity(cs));
+			addLeaf(offset, key, cs);
 		}
 	}
 
