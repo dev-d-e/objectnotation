@@ -10,7 +10,6 @@ import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
-import com.github.dev.objectnotation.value.Entity;
 
 final class ObjectBuilder {
 
@@ -64,16 +63,12 @@ final class ObjectBuilder {
 					property.setForBean(object, t -> buildByClass(childNodes, t), o -> buildForObject(childNodes, o));
 				}
 			} else if (node instanceof LeafNode) {
-				Entity en = ((LeafNode) node).getEntity();
-				if (en == null) {
-					continue;
-				}
 				if (c.isArray()) {
-					property.setForArrayByEntity(object, en);
+					property.setForArrayByType(object, ((LeafNode) node).getTypeAdapter());
 				} else if (Collection.class.isAssignableFrom(c)) {
-					property.setForCollectionByEntity(object, en);
+					property.setForCollectionByType(object, ((LeafNode) node).getTypeAdapter());
 				} else {
-					property.invokeWriteMethodByEntity(object, en);
+					property.invokeWriteMethodByType(object, ((LeafNode) node).getTypeAdapter());
 				}
 			}
 		}
