@@ -7,23 +7,22 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.github.dev.objectnotation.value.Entity;
-
 class ClassProperty {
 
 	private final Map<String, Property> map = new HashMap<>();
+
+	private final List<Exception> exceptions = new ArrayList<>();
 
 	ClassProperty(Class<?> c) {
 		try {
@@ -36,12 +35,20 @@ class ClassProperty {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			exceptions.add(e);
 		}
 	}
 
 	public Property getProperty(String name) {
 		return map.get(name);
+	}
+
+	public boolean containsException() {
+		return exceptions.size() > 0;
+	}
+
+	public List<Exception> getExceptions() {
+		return exceptions;
 	}
 
 	class Property {
@@ -88,7 +95,7 @@ class ClassProperty {
 				try {
 					return readMethod.invoke(obj);
 				} catch (Exception e) {
-					e.printStackTrace();
+					exceptions.add(e);
 				}
 			}
 			return null;
@@ -100,75 +107,29 @@ class ClassProperty {
 					writeMethod.invoke(obj, arg);
 					return true;
 				} catch (Exception e) {
-					e.printStackTrace();
+					exceptions.add(e);
 				}
 			}
 			return false;
 		}
 
-		public boolean invokeWriteMethodByEntity(Object object, Entity entity) {
+		public boolean invokeWriteMethodByType(Object object, TextTypeAdapter adapter) {
 			if (writeMethod != null) {
 				try {
-					invokeWriteMethodByEntity0(object, entity);
+					Optional<Object> v = adapter.toAnother(type);
+					if (v.isPresent()) {
+						writeMethod.invoke(object, v.get());
+					}
 					return true;
 				} catch (Exception e) {
-					e.printStackTrace();
+					exceptions.add(e);
 				}
 			}
 			return false;
 		}
 
-		private void invokeWriteMethodByEntity0(Object object, Entity entity) throws Exception {
-			if (boolean.class == type || Boolean.TYPE == type) {
-				writeMethod.invoke(object, entity.booleanValue());
-			} else if (byte.class == type || Byte.TYPE == type) {
-				writeMethod.invoke(object, entity.byteValue());
-			} else if (char.class == type || Character.TYPE == type) {
-				writeMethod.invoke(object, entity.getValue().charAt(0));
-			} else if (int.class == type || Integer.TYPE == type) {
-				writeMethod.invoke(object, entity.intValue());
-			} else if (long.class == type || Long.TYPE == type) {
-				writeMethod.invoke(object, entity.longValue());
-			} else if (short.class == type || Short.TYPE == type) {
-				writeMethod.invoke(object, entity.shortValue());
-			} else if (float.class == type || Float.TYPE == type) {
-				writeMethod.invoke(object, entity.floatValue());
-			} else if (double.class == type || Double.TYPE == type) {
-				writeMethod.invoke(object, entity.doubleValue());
-			} else if (BigInteger.class == type) {
-				writeMethod.invoke(object, entity.bigIntegerValue());
-			} else if (BigDecimal.class == type) {
-				writeMethod.invoke(object, entity.bigDecimalValue());
-			} else if (String.class == type) {
-				writeMethod.invoke(object, entity.getValue());
-			}
-		}
-
-		public void setForArrayByEntity(Object object, Entity entity) {
-			Class<?> componentType = type.getComponentType();
-			if (boolean.class == componentType || Boolean.TYPE == componentType) {
-				setForArray(object, entity.booleanValue());
-			} else if (byte.class == componentType || Byte.TYPE == componentType) {
-				setForArray(object, entity.byteValue());
-			} else if (char.class == componentType || Character.TYPE == componentType) {
-				setForArray(object, entity.getValue().charAt(0));
-			} else if (int.class == componentType || Integer.TYPE == componentType) {
-				setForArray(object, entity.intValue());
-			} else if (long.class == componentType || Long.TYPE == componentType) {
-				setForArray(object, entity.longValue());
-			} else if (short.class == componentType || Short.TYPE == componentType) {
-				setForArray(object, entity.shortValue());
-			} else if (float.class == componentType || Float.TYPE == componentType) {
-				setForArray(object, entity.floatValue());
-			} else if (double.class == componentType || Double.TYPE == componentType) {
-				setForArray(object, entity.doubleValue());
-			} else if (BigInteger.class == componentType) {
-				setForArray(object, entity.bigIntegerValue());
-			} else if (BigDecimal.class == componentType) {
-				setForArray(object, entity.bigDecimalValue());
-			} else if (String.class == componentType) {
-				setForArray(object, entity.getValue());
-			}
+		public void setForArrayByType(Object object, TextTypeAdapter adapter) {
+			adapter.toAnother(type.getComponentType()).ifPresent(v -> setForArray(object, v));
 		}
 
 		public void setForArray(Object object, Object v) {
@@ -187,31 +148,8 @@ class ClassProperty {
 			invokeWriteMethod(object, newArray);
 		}
 
-		public void setForCollectionByEntity(Object object, Entity entity) {
-			Class<?> type = genericTypes0[0];
-			if (boolean.class == type || Boolean.TYPE == type) {
-				setForCollection(object, t -> entity.booleanValue());
-			} else if (byte.class == type || Byte.TYPE == type) {
-				setForCollection(object, t -> entity.byteValue());
-			} else if (char.class == type || Character.TYPE == type) {
-				setForCollection(object, t -> entity.getValue().charAt(0));
-			} else if (int.class == type || Integer.TYPE == type) {
-				setForCollection(object, t -> entity.intValue());
-			} else if (long.class == type || Long.TYPE == type) {
-				setForCollection(object, t -> entity.longValue());
-			} else if (short.class == type || Short.TYPE == type) {
-				setForCollection(object, t -> entity.shortValue());
-			} else if (float.class == type || Float.TYPE == type) {
-				setForCollection(object, t -> entity.floatValue());
-			} else if (double.class == type || Double.TYPE == type) {
-				setForCollection(object, t -> entity.doubleValue());
-			} else if (BigInteger.class == type) {
-				setForCollection(object, t -> entity.bigIntegerValue());
-			} else if (BigDecimal.class == type) {
-				setForCollection(object, t -> entity.bigDecimalValue());
-			} else if (String.class == type) {
-				setForCollection(object, t -> entity.getValue());
-			}
+		public void setForCollectionByType(Object object, TextTypeAdapter adapter) {
+			adapter.toAnother(genericTypes0[0]).ifPresent(v -> setForCollection(object, t -> v));
 		}
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -269,7 +207,7 @@ class ClassProperty {
 			try {
 				return c.getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
-				e.printStackTrace();
+				exceptions.add(e);
 			}
 			return null;
 		}
