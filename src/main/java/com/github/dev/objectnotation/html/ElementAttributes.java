@@ -75,7 +75,7 @@ final class ElementAttributes {
 	/**
 	 * Returns true if an element has the attribute.
 	 */
-	public static boolean isAttribute(String n, String str) {
+	public static boolean isAttr(String n, String str) {
 		if (n == null || n.isEmpty() || str == null || str.isEmpty()) {
 			return false;
 		}
