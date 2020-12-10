@@ -1,12 +1,13 @@
 package com.github.dev.objectnotation.html;
 
-import java.util.List;
+import java.util.Optional;
 
 import com.github.dev.objectnotation.DirectTextInvoker;
 import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
+import com.github.dev.objectnotation.tree.NodeUtils;
 
 /**
  * Converter.
@@ -14,54 +15,52 @@ import com.github.dev.objectnotation.tree.Node;
 public class HtmlConverter {
 
 	public static String convert(CharSequence charSequence) {
-		Document document = DirectTextInvoker.accept(charSequence);
-		TagImpl t = convert(document);
-		return t.asHtml();
+		return convert(DirectTextInvoker.accept(charSequence));
 	}
 
-	private static TagImpl convert(Document doc) {
-		List<Node> nodes = doc.nodes();
-		if (nodes == null || nodes.isEmpty()) {
-			return TagImpl.EMPTY;
+	public static String convert(Document doc) {
+		Optional<Node> op = doc.nodes().stream().filter(o -> "html".equals(o.getKey().toLowerCase())).findAny();
+		if (op.isEmpty()) {
+			return "";
 		}
-		Node node = null;
-		if (nodes.size() == 1) {
-			node = nodes.get(0);
-		} else {
-			for (Node o : nodes) {
-				if ("html".equalsIgnoreCase(o.getKey())) {
-					node = o;
-					break;
-				}
-			}
-		}
-		if (node == null) {
-			return TagImpl.EMPTY;
-		}
-		TagImpl t = new TagImpl(node.getKey());
-		if (node instanceof BranchNode) {
-			((BranchNode) node).nodes().forEach(o -> fillTag(t, o));
-		}
-		return t;
+		return convert(op.get()).make();
 	}
 
-	private static void fillTag(Tag t, Node node) {
+	private static Element convert(Node node) {
+		Element e = new Element(node.getKey());
+		NodeUtils.ifBranch(node, branch -> branch.getAll().forEach(o -> fill(e, o)));
+		return e;
+	}
+
+	private static void fill(Element e, Node node) {
+		NodeUtils.ifBranch(node, branch -> fill(e, branch));
+		NodeUtils.ifLeaf(node, leaf -> fill(e, leaf));
+	}
+
+	private static void fill(Element e, BranchNode node) {
 		String k = node.getKey();
-		if (node instanceof BranchNode) {
-			if (Attributes.containsAttr(k)) {
-				((BranchNode) node).nodes().stream().filter(o -> o instanceof LeafNode).map(o -> ((LeafNode) o)).forEach(o -> o.getText().ifPresent(s -> t.setAttribute(o.getKey(), s)));
-			} else {
-				Tag n = t.createTag(k);
-				((BranchNode) node).nodes().forEach(o -> fillTag(n, o));
-			}
-		} else if (node instanceof LeafNode) {
-			if (Attributes.isAttr(k) || ElementAttributes.isAttribute(t.getTagName(), k)) {
-				((LeafNode) node).getText().ifPresent(s -> t.setAttribute(k, s));
-			} else {
-				Tag n = t.createTag(k);
-				((LeafNode) node).getText().ifPresent(s -> n.setTagValue(s));
-			}
+		if (Attributes.containsAttr(k)) {
+			node.getLeaf().forEach(o -> o.getText().ifPresent(s -> e.addAttr(o.getKey(), s)));
+		} else {
+			Element c = createElement(k, e);
+			node.getAll().forEach(o -> fill(c, o));
 		}
+	}
+
+	private static void fill(Element e, LeafNode node) {
+		String k = node.getKey();
+		if (Attributes.isAttr(k) || ElementAttributes.isAttr(e.getName(), k)) {
+			node.getText().ifPresent(s -> e.addAttr(k, s));
+		} else {
+			Element c = createElement(k, e);
+			node.getText().ifPresent(s -> c.setText(s));
+		}
+	}
+
+	private static Element createElement(String name, Element p) {
+		Element e = new Element(name);
+		p.addElement(e);
+		return e;
 	}
 
 }
