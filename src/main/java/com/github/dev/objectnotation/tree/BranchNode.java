@@ -8,23 +8,6 @@ import java.util.List;
 public interface BranchNode extends Node {
 
 	/**
-	 * Returns all child nodes.
-	 */
-	List<Node> nodes();
-
-	/**
-	 * Returns the number of child nodes.
-	 */
-	int size();
-
-	/**
-	 * Returns node at the specified index position.
-	 * 
-	 * @param index the index of the node.
-	 */
-	Node node(int index);
-
-	/**
 	 * Add a child node.
 	 * 
 	 * @param node a child node.
@@ -32,10 +15,25 @@ public interface BranchNode extends Node {
 	BranchNode add(Node node);
 
 	/**
+	 * Returns all child nodes.
+	 */
+	List<Node> getAll();
+
+	/**
 	 * Returns child nodes by key.
 	 * 
 	 * @param key the key of the node.
 	 */
-	List<Node> node(String key);
+	List<Node> get(String key);
+
+	/**
+	 * Returns child branch nodes.
+	 */
+	List<BranchNode> getBranch();
+
+	/**
+	 * Returns child leaf nodes.
+	 */
+	List<LeafNode> getLeaf();
 
 }
