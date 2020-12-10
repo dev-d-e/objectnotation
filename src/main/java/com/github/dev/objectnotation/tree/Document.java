@@ -24,13 +24,6 @@ public interface Document {
 	List<Node> nodes();
 
 	/**
-	 * Returns node at the specified index position.
-	 * 
-	 * @param index the index of the node.
-	 */
-	Node node(int index);
-
-	/**
 	 * Add a node.
 	 * 
 	 * @param node a node.
