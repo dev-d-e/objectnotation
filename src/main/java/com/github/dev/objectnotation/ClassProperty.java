@@ -39,8 +39,8 @@ class ClassProperty {
 		}
 	}
 
-	public Property getProperty(String name) {
-		return map.get(name);
+	public Optional<Property> getProperty(String name) {
+		return Optional.ofNullable(map.get(name));
 	}
 
 	public boolean containsException() {
