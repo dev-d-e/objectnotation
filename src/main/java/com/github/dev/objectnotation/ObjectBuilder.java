@@ -10,6 +10,7 @@ import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
 import com.github.dev.objectnotation.tree.Node;
+import com.github.dev.objectnotation.tree.NodeUtils;
 
 final class ObjectBuilder {
 
@@ -45,34 +46,38 @@ final class ObjectBuilder {
 
 	private static <T> T buildForObject(List<Node> nodes, T object) {
 		ClassProperty p = new ClassProperty(object.getClass());
-		for (Node node : nodes) {
-			Property property = p.getProperty(node.getKey());
-			if (property == null) {
-				continue;
-			}
-			Class<?> c = property.getType();
-			if (node instanceof BranchNode) {
-				List<Node> childNodes = ((BranchNode) node).nodes();
-				if (c.isArray()) {
-					property.setForArray(object, buildByClass(childNodes, c.getComponentType()));
-				} else if (Collection.class.isAssignableFrom(c)) {
-					property.setForCollection(object, t -> buildByClass(childNodes, t));
-				} else if (Map.class.isAssignableFrom(c)) {
-					property.setForMap(object, t -> buildByClass(childNodes, t));
-				} else {
-					property.setForBean(object, t -> buildByClass(childNodes, t), o -> buildForObject(childNodes, o));
-				}
-			} else if (node instanceof LeafNode) {
-				if (c.isArray()) {
-					property.setForArrayByType(object, ((LeafNode) node).getTypeAdapter());
-				} else if (Collection.class.isAssignableFrom(c)) {
-					property.setForCollectionByType(object, ((LeafNode) node).getTypeAdapter());
-				} else {
-					property.invokeWriteMethodByType(object, ((LeafNode) node).getTypeAdapter());
-				}
-			}
-		}
+		nodes.forEach(node -> {
+			p.getProperty(node.getKey()).ifPresent(property -> {
+				NodeUtils.ifBranch(node, o -> buildForNode(object, property, o));
+				NodeUtils.ifLeaf(node, o -> buildForNode(object, property, o));
+			});
+		});
 		return object;
+	}
+
+	private static void buildForNode(Object object, Property property, BranchNode node) {
+		Class<?> c = property.getType();
+		List<Node> childNodes = node.getAll();
+		if (c.isArray()) {
+			property.setForArray(object, buildByClass(childNodes, c.getComponentType()));
+		} else if (Collection.class.isAssignableFrom(c)) {
+			property.setForCollection(object, t -> buildByClass(childNodes, t));
+		} else if (Map.class.isAssignableFrom(c)) {
+			property.setForMap(object, t -> buildByClass(childNodes, t));
+		} else {
+			property.setForBean(object, t -> buildByClass(childNodes, t), o -> buildForObject(childNodes, o));
+		}
+	}
+
+	private static void buildForNode(Object object, Property property, LeafNode node) {
+		Class<?> c = property.getType();
+		if (c.isArray()) {
+			property.setForArrayByType(object, node.getTypeAdapter());
+		} else if (Collection.class.isAssignableFrom(c)) {
+			property.setForCollectionByType(object, node.getTypeAdapter());
+		} else {
+			property.invokeWriteMethodByType(object, node.getTypeAdapter());
+		}
 	}
 
 }
