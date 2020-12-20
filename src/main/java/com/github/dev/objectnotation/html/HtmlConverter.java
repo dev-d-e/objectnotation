@@ -2,7 +2,7 @@ package com.github.dev.objectnotation.html;
 
 import java.util.Optional;
 
-import com.github.dev.objectnotation.DirectTextInvoker;
+import com.github.dev.objectnotation.ResolveTextInvoker;
 import com.github.dev.objectnotation.tree.BranchNode;
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.LeafNode;
@@ -15,7 +15,7 @@ import com.github.dev.objectnotation.tree.NodeUtils;
 public class HtmlConverter {
 
 	public static String convert(CharSequence charSequence) {
-		return convert(DirectTextInvoker.accept(charSequence));
+		return convert(ResolveTextInvoker.accept(charSequence));
 	}
 
 	public static String convert(Document doc) {
