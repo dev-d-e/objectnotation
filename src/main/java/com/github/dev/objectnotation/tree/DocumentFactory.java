@@ -2,10 +2,12 @@ package com.github.dev.objectnotation.tree;
 
 import java.util.Objects;
 
+import com.github.dev.objectnotation.Header;
+
 /**
  * Document factory.
  */
-public class DocumentFactory {
+public final class DocumentFactory {
 
 	private final DocumentImpl document = new DocumentImpl();
 
@@ -89,6 +91,11 @@ public class DocumentFactory {
 		} else {
 			addLeaf(offset, key, cs);
 		}
+	}
+
+	public void add(Header header) {
+		header.getConfiguration().forEach(s -> document.configure(s, s));
+		header.getExternalResources().forEach(s -> document.externalResource(s));
 	}
 
 }
