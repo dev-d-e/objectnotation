@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -40,7 +41,16 @@ class ClassProperty {
 	}
 
 	public Optional<Property> getProperty(String name) {
-		return Optional.ofNullable(map.get(name));
+		Property p = map.get(name);
+		if (p == null) {
+			for (Entry<String, Property> e : map.entrySet()) {
+				if (e.getKey().equalsIgnoreCase(name)) {
+					p = e.getValue();
+					break;
+				}
+			}
+		}
+		return Optional.ofNullable(p);
 	}
 
 	public boolean containsException() {
