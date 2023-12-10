@@ -1,19 +1,15 @@
 package com.github.dev.objectnotation;
 
 import static com.github.dev.objectnotation.Constants.BACKSLASH;
-import static com.github.dev.objectnotation.Constants.BRACKET;
 import static com.github.dev.objectnotation.Constants.COLON;
 import static com.github.dev.objectnotation.Constants.COMMA;
-import static com.github.dev.objectnotation.Constants.MAX_LENGTH;
 import static com.github.dev.objectnotation.Constants.NUMBERSIGN;
-import static com.github.dev.objectnotation.Constants.OFFSET_MAX_LENGTH;
+import static com.github.dev.objectnotation.Constants.PLUS;
 import static com.github.dev.objectnotation.Constants.SPACE;
 import static com.github.dev.objectnotation.Constants.TILDE;
-import static com.github.dev.objectnotation.Constants.invalidChar;
+import static com.github.dev.objectnotation.Constants.VERTICAL;
 import static com.github.dev.objectnotation.Constants.isCRLF;
 import static com.github.dev.objectnotation.Constants.isDigit;
-import static com.github.dev.objectnotation.Constants.isMark;
-import static com.github.dev.objectnotation.Constants.validChar;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -56,7 +52,8 @@ final class Parser {
 	 * @param textConsumer   the consumer of the text.
 	 * @param errConsumer    the consumer of the error.
 	 */
-	Parser(Consumer<Header> headerConsumer, IntStringConsumer keyConsumer, IntConsumer textController, IntConsumer textConsumer, BiConsumer<Integer, Integer> errConsumer) {
+	Parser(Consumer<Header> headerConsumer, IntStringConsumer keyConsumer, IntConsumer textController,
+			IntConsumer textConsumer, BiConsumer<Integer, Integer> errConsumer) {
 		Objects.requireNonNull(headerConsumer);
 		Objects.requireNonNull(keyConsumer);
 		Objects.requireNonNull(textController);
@@ -103,12 +100,6 @@ final class Parser {
 
 	private IntConsumer functionKey1;
 
-	private IntConsumer functionMark;
-
-	private boolean markArray;
-
-	private boolean markBackslash;
-
 	private IntConsumer functionText0;
 
 	private IntConsumer functionText1;
@@ -121,7 +112,7 @@ final class Parser {
 
 	{
 		functionHeader0 = i -> {
-			builder = new StringBuilder(MAX_LENGTH);
+			builder = new StringBuilder();
 			if (i == NUMBERSIGN) {
 				currentFunction = functionHeader1;
 				return;
@@ -149,17 +140,8 @@ final class Parser {
 				currentFunction.accept(i);
 				return;
 			}
-			if (builder.length() < MAX_LENGTH) {
-				builder.append((char) i);
-				return;
-			}
-			currentFunction = j -> {
-				if (isCRLF(j)) {
-					currentFunction = headerParseNewLine;
-					currentFunction.accept(j);
-				}
-			};
-			errConsumer.accept(row, n);
+			builder.append((char) i);
+			return;
 		};
 
 		headerParseNewLine = new ParseNewLine(() -> row++, i -> {
@@ -175,7 +157,7 @@ final class Parser {
 		});
 
 		functionOffset0 = i -> {
-			builder = new StringBuilder(OFFSET_MAX_LENGTH);
+			builder = new StringBuilder();
 			if (isDigit(i)) {
 				currentFunction = functionOffset1;
 				currentFunction.accept(i);
@@ -189,7 +171,7 @@ final class Parser {
 		};
 
 		functionOffset1 = i -> {
-			if (isDigit(i) && n < OFFSET_MAX_LENGTH) {
+			if (isDigit(i)) {
 				builder.append((char) i);
 				return;
 			} else if (i == TILDE) {
@@ -226,8 +208,8 @@ final class Parser {
 		};
 
 		functionKey0 = i -> {
-			builder = new StringBuilder(MAX_LENGTH);
-			if (invalidChar(i)) {
+			builder = new StringBuilder();
+			if (isCRLF(i)) {
 				errConsumer.accept(row, n);
 				currentFunction = functionOffset2;
 				currentFunction.accept(i);
@@ -245,34 +227,13 @@ final class Parser {
 					currentFunction = functionText0;
 					return;
 				}
-			} else if (isMark(i)) {
-				currentFunction = functionMark;
-				currentFunction.accept(i);
-				return;
-			} else if (validChar(i) && builder.length() < MAX_LENGTH) {
-				builder.append((char) i);
-				return;
-			}
-			errConsumer.accept(row, n);
-			currentFunction = functionOffset2;
-			currentFunction.accept(i);
-		};
-
-		functionMark = i -> {
-			if (i == BRACKET) {
-				markArray = true;
-				return;
-			} else if (i == BACKSLASH) {
-			} else if (i == SPACE) {
-				return;
-			} else if (i == COLON) {
-				currentFunction = functionKey1;
+			} else if (isCRLF(i)) {
+				errConsumer.accept(row, n);
+				currentFunction = functionOffset2;
 				currentFunction.accept(i);
 				return;
 			}
-			errConsumer.accept(row, n);
-			currentFunction = functionOffset2;
-			currentFunction.accept(i);
+			builder.append((char) i);
 		};
 
 		functionText0 = i -> {
@@ -288,9 +249,9 @@ final class Parser {
 				textController.accept(-1);
 				currentFunction = functionOffset0;
 				return;
-			} else if (i == COMMA && markArray) {
+			} else if (i == COMMA) {
 				textController.accept(-2);
-			} else if (i == BACKSLASH && markBackslash) {
+			} else if (i == BACKSLASH) {
 				textConsumer.accept(i);
 			} else if (isCRLF(i)) {
 				currentFunction = textParseNewLine;
@@ -325,7 +286,7 @@ final class Parser {
 				currentFunction = functionOffset0;
 				currentFunction.accept(i);
 				return;
-			} else if (i == SPACE) {
+			} else if (i == SPACE || i == VERTICAL || i == PLUS) {
 				currentFunction = functionNext1;
 				return;
 			}
@@ -346,6 +307,9 @@ final class Parser {
 					currentFunction = functionText1;
 					return;
 				}
+			} else if (i == VERTICAL || i == PLUS) {
+				currentFunction = functionText1;
+				return;
 			}
 			textController.accept(-1);
 			errConsumer.accept(row, n);
