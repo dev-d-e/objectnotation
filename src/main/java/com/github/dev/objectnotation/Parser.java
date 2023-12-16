@@ -2,7 +2,6 @@ package com.github.dev.objectnotation;
 
 import static com.github.dev.objectnotation.Constants.BACKSLASH;
 import static com.github.dev.objectnotation.Constants.COLON;
-import static com.github.dev.objectnotation.Constants.COMMA;
 import static com.github.dev.objectnotation.Constants.NUMBERSIGN;
 import static com.github.dev.objectnotation.Constants.PLUS;
 import static com.github.dev.objectnotation.Constants.SPACE;
@@ -12,7 +11,6 @@ import static com.github.dev.objectnotation.Constants.isCRLF;
 import static com.github.dev.objectnotation.Constants.isDigit;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
@@ -35,35 +33,20 @@ final class Parser {
 
 	private Consumer<Header> headerConsumer;
 
-	private IntStringConsumer keyConsumer;
-
-	private IntConsumer textController;
-
-	private IntConsumer textConsumer;
-
-	private BiConsumer<Integer, Integer> errConsumer;
+	private Contents contents;
 
 	/**
 	 * Constructs a {@code Parser} with consumers.
 	 *
 	 * @param headerConsumer the consumer of the header.
-	 * @param keyConsumer    the consumer of the key.
-	 * @param textController the output controller.
-	 * @param textConsumer   the consumer of the text.
-	 * @param errConsumer    the consumer of the error.
+	 * @param contents       the consumer of the key,text,error.
 	 */
-	Parser(Consumer<Header> headerConsumer, IntStringConsumer keyConsumer, IntConsumer textController,
-			IntConsumer textConsumer, BiConsumer<Integer, Integer> errConsumer) {
+	Parser(Consumer<Header> headerConsumer, Contents contents) {
 		Objects.requireNonNull(headerConsumer);
-		Objects.requireNonNull(keyConsumer);
-		Objects.requireNonNull(textController);
-		Objects.requireNonNull(textConsumer);
-		Objects.requireNonNull(errConsumer);
+		Objects.requireNonNull(contents);
 		this.headerConsumer = headerConsumer;
-		this.keyConsumer = keyConsumer;
-		this.textController = textController;
-		this.textConsumer = textConsumer;
-		this.errConsumer = errConsumer;
+		this.contents = contents;
+
 	}
 
 	void apply(int i) {
@@ -94,11 +77,11 @@ final class Parser {
 
 	private int offsetNumber = -1;
 
-	private int offsetLength;
-
 	private IntConsumer functionKey0;
 
 	private IntConsumer functionKey1;
+
+	private IntConsumer functionKeyBackslash;
 
 	private IntConsumer functionText0;
 
@@ -118,12 +101,8 @@ final class Parser {
 				return;
 			}
 			if (isCRLF(i)) {
-				currentFunction = headerParseNewLine;
-				currentFunction.accept(i);
+				error();
 				return;
-			}
-			if (!header.isEmpty()) {
-				headerConsumer.accept(header);
 			}
 			currentFunction = functionOffset0;
 			currentFunction.accept(i);
@@ -136,6 +115,9 @@ final class Parser {
 				return;
 			}
 			if (isCRLF(i)) {
+				if (!header.isEmpty()) {
+					headerConsumer.accept(header);
+				}
 				currentFunction = headerParseNewLine;
 				currentFunction.accept(i);
 				return;
@@ -164,10 +146,11 @@ final class Parser {
 			} else if (isCRLF(i)) {
 				currentFunction = functionOffset2;
 				currentFunction.accept(i);
-			} else {
-				currentFunction = functionOffset2;
-				errConsumer.accept(row, n);
+			} else if (i == -1) {
+				return;
 			}
+			currentFunction = functionOffset2;
+			error();
 		};
 
 		functionOffset1 = i -> {
@@ -176,7 +159,6 @@ final class Parser {
 				return;
 			} else if (i == TILDE) {
 				String offsetStr = builder.toString();
-				offsetLength = offsetStr.length();
 				offsetNumber = Integer.parseInt(offsetStr);
 				if (offsetNumber == 0) {
 					offsetAvailable = 1;
@@ -193,7 +175,7 @@ final class Parser {
 				currentFunction.accept(i);
 			}
 			currentFunction = functionOffset2;
-			errConsumer.accept(row, n);
+			error();
 		};
 
 		functionOffset2 = i -> {
@@ -208,9 +190,9 @@ final class Parser {
 		};
 
 		functionKey0 = i -> {
-			builder = new StringBuilder();
+			contents.preKey(offsetNumber);
 			if (isCRLF(i)) {
-				errConsumer.accept(row, n);
+				error();
 				currentFunction = functionOffset2;
 				currentFunction.accept(i);
 			} else {
@@ -221,22 +203,38 @@ final class Parser {
 
 		functionKey1 = i -> {
 			if (i == COLON) {
-				String k = builder.toString().trim();
-				if (!k.isEmpty()) {
-					keyConsumer.accept(offsetNumber, k);
-					currentFunction = functionText0;
-					return;
-				}
+				contents.postKey();
+				currentFunction = functionText0;
+				return;
+			} else if (i == BACKSLASH) {
+				currentFunction = functionKeyBackslash;
+				return;
 			} else if (isCRLF(i)) {
-				errConsumer.accept(row, n);
+				contents.postKey();
+				contents.postText();
 				currentFunction = functionOffset2;
 				currentFunction.accept(i);
+				return;
+			} else if (i == -1) {
+				contents.postKey();
+				contents.postText();
+				currentFunction = functionOffset0;
 				return;
 			}
 			builder.append((char) i);
 		};
 
+		functionKeyBackslash = i -> {
+			if (isCRLF(i)) {
+				currentFunction = functionKey1;
+				currentFunction.accept(i);
+			}
+			builder.append((char) i);
+			currentFunction = functionKey1;
+		};
+
 		functionText0 = i -> {
+			contents.preText();
 			if (i > -1 && !isCRLF(i)) {
 				offsetAvailable = offsetNumber;
 			}
@@ -246,28 +244,23 @@ final class Parser {
 
 		functionText1 = i -> {
 			if (i == -1) {
-				textController.accept(-1);
+				contents.postText();
 				currentFunction = functionOffset0;
 				return;
-			} else if (i == COMMA) {
-				textController.accept(-2);
-			} else if (i == BACKSLASH) {
-				textConsumer.accept(i);
 			} else if (isCRLF(i)) {
 				currentFunction = textParseNewLine;
 				currentFunction.accept(i);
-			} else {
-				textConsumer.accept(i);
 			}
+			contents.text(i);
 		};
 
 		textParseNewLine = new ParseNewLine(i -> {
-			textConsumer.accept(i);
+			contents.text(i);
 			if (offsetAvailable > offsetNumber) {
 				offsetAvailable = offsetNumber;
 			}
 		}, () -> row++, i -> {
-			if (i == SPACE) {
+			if (i == VERTICAL) {
 				textParseNewLine.output();
 			}
 			n = 0;
@@ -277,46 +270,40 @@ final class Parser {
 
 		functionNext0 = i -> {
 			if (i == -1) {
-				textController.accept(-1);
+				contents.postText();
 				currentFunction = functionOffset0;
 				return;
 			}
-			if (isDigit(i)) {
-				textController.accept(-1);
-				currentFunction = functionOffset0;
-				currentFunction.accept(i);
-				return;
-			} else if (i == SPACE || i == VERTICAL || i == PLUS) {
+			if (i == SPACE || i == VERTICAL || i == PLUS) {
 				currentFunction = functionNext1;
 				return;
 			}
-			currentFunction = functionNext1;
+			contents.postText();
+			currentFunction = functionOffset0;
 			currentFunction.accept(i);
 		};
 
 		functionNext1 = i -> {
 			if (i == -1) {
-				textController.accept(-1);
+				contents.postText();
 				currentFunction = functionOffset0;
 				return;
 			}
 			if (i == SPACE) {
-				if (n < offsetLength) {
-					return;
-				} else if (n == offsetLength) {
-					currentFunction = functionText1;
-					return;
-				}
+				return;
 			} else if (i == VERTICAL || i == PLUS) {
 				currentFunction = functionText1;
 				return;
 			}
-			textController.accept(-1);
-			errConsumer.accept(row, n);
+			contents.postText();
+			error();
 			currentFunction = functionOffset2;
 			currentFunction.accept(i);
 		};
 
 	}
 
+	private void error() {
+		contents.error(row, n);
+	}
 }
