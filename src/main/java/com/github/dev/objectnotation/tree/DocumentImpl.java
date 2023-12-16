@@ -26,7 +26,7 @@ class DocumentImpl implements Document {
 	/**
 	 * Trees.
 	 */
-	private final List<Node> nodes = new ArrayList<>();
+	private final LinkedHashMap<String, List<Node>> nodes = new LinkedHashMap<>();
 
 	@Override
 	public Map<String, String> configuration() {
@@ -50,12 +50,22 @@ class DocumentImpl implements Document {
 
 	@Override
 	public List<Node> nodes() {
+		List<Node> rst=new ArrayList<>();
+		nodes.values().forEach(e->rst.addAll(e));
+		return rst;
+	}
+
+	@Override
+	public LinkedHashMap<String, List<Node>> getNodes() {
 		return nodes;
 	}
 
 	@Override
 	public Document add(Node node) {
-		nodes.add(node);
+		String k = node.getKey();
+		List<Node> n = nodes.getOrDefault(k, new ArrayList<>());
+		n.add(node);
+		nodes.put(k, n);
 		return this;
 	}
 
@@ -66,12 +76,12 @@ class DocumentImpl implements Document {
 		}
 		String[] keys = str.split("\\.");
 		int n = keys.length - 1;
-		Stream<Node> st = nodes.stream();
+		Stream<Node> st = nodes.get(keys[0]).stream();
 		for (int i = 0; i < keys.length; i++) {
 			String k = keys[i];
 			st = st.filter(o -> o.getKey().equals(k));
 			if (i < n) {
-				st = st.filter(o -> o instanceof BranchNode).flatMap(o -> ((BranchNode) o).getAll().stream());
+				st = st.flatMap(o -> o.getAll().stream());
 			}
 		}
 		return st.collect(Collectors.toList());
