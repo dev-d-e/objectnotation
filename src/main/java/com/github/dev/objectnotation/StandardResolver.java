@@ -3,7 +3,6 @@ package com.github.dev.objectnotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.IntConsumer;
 
 import com.github.dev.objectnotation.tree.DocumentFactory;
 
@@ -14,49 +13,17 @@ class StandardResolver {
 
 	private final Parser parser;
 
-	private int curOffset = -1;
-
-	private String curKey;
-
-	private StringBuilder builder;
-
 	private boolean quickStop = true;
 
 	private final List<int[]> invalidChars = new ArrayList<>();
 
 	StandardResolver(DocumentFactory documentFactory) {
-		parser = new Parser(o -> documentFactory.add(o), (i, s) -> {
-			curOffset = i;
-			curKey = s;
-			builder = new StringBuilder();
-		}, i -> {
-			if (builder != null) {
-				if (i == -1) {
-					documentFactory.addNode(curOffset, curKey, builder);
-					builder = null;
-				} else if (i == -2) {
-					documentFactory.addNode(curOffset, curKey, builder);
-					builder = new StringBuilder();
-				}
-			}
-		}, i -> {
-			if (builder != null) {
-				builder.append((char) i);
-			}
-		}, (i, j) -> setErr(i, j));
+		parser = new Parser(o -> documentFactory.add(o), documentFactory.getContents());
 	}
 
-	StandardResolver(IntStringConsumer keyConsumer, IntConsumer textConsumer) {
+	StandardResolver(Contents contents) {
 		parser = new Parser(o -> {
-		}, (i, s) -> {
-			curOffset = i;
-			curKey = s;
-			keyConsumer.accept(i, s);
-		}, i -> {
-			if (i == -2) {
-				keyConsumer.accept(curOffset, curKey);
-			}
-		}, textConsumer, (i, j) -> setErr(i, j));
+		}, contents);
 	}
 
 	public void apply(int i) {
