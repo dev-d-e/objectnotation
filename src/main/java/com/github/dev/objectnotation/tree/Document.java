@@ -1,5 +1,6 @@
 package com.github.dev.objectnotation.tree;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,11 @@ public interface Document {
 	 * Returns all root nodes.
 	 */
 	List<Node> nodes();
+
+	/**
+	 * Returns all root nodes.
+	 */
+	LinkedHashMap<String,List<Node>> getNodes();
 
 	/**
 	 * Add a node.
