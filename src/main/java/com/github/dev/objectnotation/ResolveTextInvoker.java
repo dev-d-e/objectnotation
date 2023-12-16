@@ -2,7 +2,7 @@ package com.github.dev.objectnotation;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.function.IntConsumer;
+import java.util.List;
 
 import com.github.dev.objectnotation.tree.Document;
 import com.github.dev.objectnotation.tree.DocumentFactory;
@@ -21,15 +21,14 @@ public final class ResolveTextInvoker {
 	/**
 	 * Resolve text, output text.
 	 *
-	 * @param array        the text.
-	 * @param keyConsumer  the consumer of the key.
-	 * @param textConsumer the consumer of the text.
+	 * @param array    the text.
+	 * @param contents the consumer of the key and text.
 	 */
-	public static void accept(char[] array, IntStringConsumer keyConsumer, IntConsumer textConsumer) {
+	public static void accept(char[] array, Contents contents) {
 		if (array == null || array.length == 0) {
 			return;
 		}
-		StandardResolver emptyResolver = new StandardResolver(keyConsumer, textConsumer);
+		StandardResolver emptyResolver = new StandardResolver(contents);
 		for (int n = 0; n < array.length; n++) {
 			emptyResolver.apply(array[n]);
 		}
@@ -40,14 +39,13 @@ public final class ResolveTextInvoker {
 	 * Resolve text, output text.
 	 *
 	 * @param charSequence the text.
-	 * @param keyConsumer  the consumer of the key.
-	 * @param textConsumer the consumer of the text.
+	 * @param contents     the consumer of the key and text.
 	 */
-	public static void accept(CharSequence charSequence, IntStringConsumer keyConsumer, IntConsumer textConsumer) {
+	public static void accept(CharSequence charSequence, Contents contents) {
 		if (charSequence == null || charSequence.length() == 0) {
 			return;
 		}
-		StandardResolver emptyResolver = new StandardResolver(keyConsumer, textConsumer);
+		StandardResolver emptyResolver = new StandardResolver(contents);
 		charSequence.chars().forEach(i -> emptyResolver.apply(i));
 		emptyResolver.apply(-1);
 	}
@@ -55,15 +53,14 @@ public final class ResolveTextInvoker {
 	/**
 	 * Resolve text, output text. the reader is not closed.
 	 *
-	 * @param reader       the text.
-	 * @param keyConsumer  the consumer of the key.
-	 * @param textConsumer the consumer of the text.
+	 * @param reader   the text.
+	 * @param contents the consumer of the key and text.
 	 */
-	public static void accept(Reader reader, IntStringConsumer keyConsumer, IntConsumer textConsumer) throws IOException {
+	public static void accept(Reader reader, Contents contents) throws IOException {
 		if (reader == null) {
 			return;
 		}
-		StandardResolver emptyResolver = new StandardResolver(keyConsumer, textConsumer);
+		StandardResolver emptyResolver = new StandardResolver(contents);
 		while (true) {
 			int i = reader.read();
 			emptyResolver.apply(i);
@@ -71,6 +68,61 @@ public final class ResolveTextInvoker {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Resolve text, output {@code List<Target>}.
+	 *
+	 * @param array the text.
+	 * @return List<Target>
+	 */
+	public static List<Target> toTarget(char[] array) {
+		DocumentFactory factory = new DocumentFactory();
+		if (array != null && array.length > 0) {
+			StandardResolver resolver = new StandardResolver(factory);
+			for (int n = 0; n < array.length; n++) {
+				resolver.apply(array[n]);
+			}
+			resolver.apply(-1);
+		}
+		return factory.build();
+	}
+
+	/**
+	 * Resolve text, output {@code List<Target>}.
+	 *
+	 * @param charSequence the text.
+	 * @return List<Target>
+	 */
+	public static List<Target> toTarget(CharSequence charSequence) {
+		DocumentFactory factory = new DocumentFactory();
+		if (charSequence != null && charSequence.length() > 0) {
+			StandardResolver resolver = new StandardResolver(factory);
+			charSequence.chars().forEach(i -> resolver.apply(i));
+			resolver.apply(-1);
+		}
+		return factory.build();
+	}
+
+	/**
+	 * Resolve text, output {@code List<Target>}. the reader is not closed.
+	 *
+	 * @param reader the text.
+	 * @return List<Target>
+	 */
+	public static List<Target> toTarget(Reader reader) throws IOException {
+		DocumentFactory factory = new DocumentFactory();
+		if (reader != null) {
+			StandardResolver resolver = new StandardResolver(factory);
+			while (true) {
+				int i = reader.read();
+				resolver.apply(i);
+				if (i == -1) {
+					break;
+				}
+			}
+		}
+		return factory.build();
 	}
 
 	/**
