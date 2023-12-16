@@ -9,16 +9,6 @@ public final class Constants {
 	}
 
 	/**
-	 * The maximum length.
-	 */
-	public static final int MAX_LENGTH = 64;
-
-	/**
-	 * The maximum length of offset.
-	 */
-	public static final int OFFSET_MAX_LENGTH = 10;
-
-	/**
 	 * '\r'
 	 */
 	public static final int CR = '\r';
@@ -54,24 +44,14 @@ public final class Constants {
 	public static final int PLUS = '+';
 
 	/**
-	 * '['
-	 */
-	public static final int BRACKET = '[';
-
-	/**
-	 * '\'
-	 */
-	public static final int BACKSLASH = '\\';
-
-	/**
 	 * ' '
 	 */
 	public static final int SPACE = ' ';
 
 	/**
-	 * ','
+	 * '\'
 	 */
-	public static final int COMMA = ',';
+	public static final int BACKSLASH = '\\';
 
 	public static boolean isCRLF(int i) {
 		return i == CR || i == LF;
