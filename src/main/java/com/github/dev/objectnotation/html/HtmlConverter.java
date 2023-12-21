@@ -1,10 +1,10 @@
 package com.github.dev.objectnotation.html;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.github.dev.objectnotation.ResolveTextInvoker;
-import com.github.dev.objectnotation.tree.Document;
-import com.github.dev.objectnotation.tree.Node;
+import com.github.dev.objectnotation.Target;
 
 /**
  * Converter.
@@ -15,30 +15,30 @@ public class HtmlConverter {
 		return convert(ResolveTextInvoker.accept(charSequence));
 	}
 
-	public static String convert(Document doc) {
-		Optional<Node> op = doc.nodes().stream().filter(o -> "html".equals(o.getKey().toLowerCase())).findAny();
+	public static String convert(List<Target> doc) {
+		Optional<Target> op = doc.stream().filter(o -> "html".equals(o.getName().toLowerCase())).findAny();
 		if (op.isEmpty()) {
 			return "";
 		}
 		return convert(op.get()).make();
 	}
 
-	private static Element convert(Node node) {
-		Element e = new Element(node.getKey());
-		node.getAll().forEach(o -> fill(e, o));
+	private static Element convert(Target target) {
+		Element e = new Element(target.getName());
+		target.getValue().forEach(o -> fill(e, o));
 		return e;
 	}
 
-	private static void fill(Element e, Node node) {
-		String k = node.getKey();
+	private static void fill(Element e, Target target) {
+		String k = target.getName();
 		if (Attributes.containsAttr(k)) {
-			node.getAll().forEach(o -> o.getText().ifPresent(s -> e.addAttr(o.getKey(), s)));
+			target.getValue().forEach(o -> o.getText().forEach(s -> e.addAttr(o.getName(), s)));
 		} else if (Attributes.isAttr(k) || ElementAttributes.isAttr(e.getName(), k)) {
-			node.getText().ifPresent(s -> e.addAttr(k, s));
+			target.getText().forEach(s -> e.addAttr(k, s));
 		} else {
 			Element c = createElement(k, e);
-			node.getText().ifPresent(s -> c.setText(s));
-			node.getAll().forEach(o -> fill(c, o));
+			target.getText().forEach(s -> c.setText(s));
+			target.getValue().forEach(o -> fill(c, o));
 		}
 	}
 
