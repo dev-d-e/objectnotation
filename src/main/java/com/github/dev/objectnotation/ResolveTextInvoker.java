@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import com.github.dev.objectnotation.tree.Document;
-import com.github.dev.objectnotation.tree.DocumentFactory;
-
 /**
  * Invoker provides static methods.
  */
@@ -76,16 +73,10 @@ public final class ResolveTextInvoker {
 	 * @param array the text.
 	 * @return List<Target>
 	 */
-	public static List<Target> toTarget(char[] array) {
-		DocumentFactory factory = new DocumentFactory();
-		if (array != null && array.length > 0) {
-			StandardResolver resolver = new StandardResolver(factory);
-			for (int n = 0; n < array.length; n++) {
-				resolver.apply(array[n]);
-			}
-			resolver.apply(-1);
-		}
-		return factory.build();
+	public static List<Target> accept(char[] array) {
+		TreeBuilder builder = new TreeBuilder();
+		accept(array, builder);
+		return builder.build();
 	}
 
 	/**
@@ -94,14 +85,10 @@ public final class ResolveTextInvoker {
 	 * @param charSequence the text.
 	 * @return List<Target>
 	 */
-	public static List<Target> toTarget(CharSequence charSequence) {
-		DocumentFactory factory = new DocumentFactory();
-		if (charSequence != null && charSequence.length() > 0) {
-			StandardResolver resolver = new StandardResolver(factory);
-			charSequence.chars().forEach(i -> resolver.apply(i));
-			resolver.apply(-1);
-		}
-		return factory.build();
+	public static List<Target> accept(CharSequence charSequence) {
+		TreeBuilder builder = new TreeBuilder();
+		accept(charSequence, builder);
+		return builder.build();
 	}
 
 	/**
@@ -110,74 +97,10 @@ public final class ResolveTextInvoker {
 	 * @param reader the text.
 	 * @return List<Target>
 	 */
-	public static List<Target> toTarget(Reader reader) throws IOException {
-		DocumentFactory factory = new DocumentFactory();
-		if (reader != null) {
-			StandardResolver resolver = new StandardResolver(factory);
-			while (true) {
-				int i = reader.read();
-				resolver.apply(i);
-				if (i == -1) {
-					break;
-				}
-			}
-		}
-		return factory.build();
-	}
-
-	/**
-	 * Resolve text, output {@code Document}.
-	 *
-	 * @param array the text.
-	 * @return Document
-	 */
-	public static Document accept(char[] array) {
-		DocumentFactory factory = new DocumentFactory();
-		if (array != null && array.length > 0) {
-			StandardResolver resolver = new StandardResolver(factory);
-			for (int n = 0; n < array.length; n++) {
-				resolver.apply(array[n]);
-			}
-			resolver.apply(-1);
-		}
-		return factory.getDocument();
-	}
-
-	/**
-	 * Resolve text, output {@code Document}.
-	 *
-	 * @param charSequence the text.
-	 * @return Document
-	 */
-	public static Document accept(CharSequence charSequence) {
-		DocumentFactory factory = new DocumentFactory();
-		if (charSequence != null && charSequence.length() > 0) {
-			StandardResolver resolver = new StandardResolver(factory);
-			charSequence.chars().forEach(i -> resolver.apply(i));
-			resolver.apply(-1);
-		}
-		return factory.getDocument();
-	}
-
-	/**
-	 * Resolve text, output {@code Document}. the reader is not closed.
-	 *
-	 * @param reader the text.
-	 * @return Document
-	 */
-	public static Document accept(Reader reader) throws IOException {
-		DocumentFactory factory = new DocumentFactory();
-		if (reader != null) {
-			StandardResolver resolver = new StandardResolver(factory);
-			while (true) {
-				int i = reader.read();
-				resolver.apply(i);
-				if (i == -1) {
-					break;
-				}
-			}
-		}
-		return factory.getDocument();
+	public static List<Target> accept(Reader reader) throws IOException {
+		TreeBuilder builder = new TreeBuilder();
+		accept(reader, builder);
+		return builder.build();
 	}
 
 	/**
@@ -187,7 +110,9 @@ public final class ResolveTextInvoker {
 	 * @param obj   the output.
 	 */
 	public static <T> void accept(char[] array, T obj) {
-		ObjectBuilder.build(accept(array), obj);
+		TreeBuilder builder = new TreeBuilder();
+		accept(array, builder);
+		ObjectBuilder.build(builder.getRoot(), obj);
 	}
 
 	/**
@@ -198,7 +123,9 @@ public final class ResolveTextInvoker {
 	 * @return T
 	 */
 	public static <T> T accept(char[] array, Class<T> type) {
-		return ObjectBuilder.build(accept(array), type);
+		TreeBuilder builder = new TreeBuilder();
+		accept(array, builder);
+		return ObjectBuilder.build(builder.getRoot(), type);
 	}
 
 	/**
@@ -208,7 +135,9 @@ public final class ResolveTextInvoker {
 	 * @param obj          the output.
 	 */
 	public static <T> void accept(CharSequence charSequence, T obj) {
-		ObjectBuilder.build(accept(charSequence), obj);
+		TreeBuilder builder = new TreeBuilder();
+		accept(charSequence, builder);
+		ObjectBuilder.build(builder.getRoot(), obj);
 	}
 
 	/**
@@ -219,7 +148,9 @@ public final class ResolveTextInvoker {
 	 * @return T
 	 */
 	public static <T> T accept(CharSequence charSequence, Class<T> type) {
-		return ObjectBuilder.build(accept(charSequence), type);
+		TreeBuilder builder = new TreeBuilder();
+		accept(charSequence, type);
+		return ObjectBuilder.build(builder.getRoot(), type);
 	}
 
 	/**
@@ -229,7 +160,9 @@ public final class ResolveTextInvoker {
 	 * @param obj    the output.
 	 */
 	public static <T> void accept(Reader reader, T obj) throws IOException {
-		ObjectBuilder.build(accept(reader), obj);
+		TreeBuilder builder = new TreeBuilder();
+		accept(reader, builder);
+		ObjectBuilder.build(builder.getRoot(), obj);
 	}
 
 	/**
@@ -240,7 +173,9 @@ public final class ResolveTextInvoker {
 	 * @return T
 	 */
 	public static <T> T accept(Reader reader, Class<T> type) throws IOException {
-		return ObjectBuilder.build(accept(reader), type);
+		TreeBuilder builder = new TreeBuilder();
+		accept(reader, builder);
+		return ObjectBuilder.build(builder.getRoot(), type);
 	}
 
 }
