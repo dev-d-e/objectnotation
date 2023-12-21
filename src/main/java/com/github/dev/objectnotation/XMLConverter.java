@@ -35,8 +35,8 @@ class Converter implements Contents {
 	}
 
 	@Override
-	public void key(int i) {
-		key.append((char) i);
+	public void key(char i) {
+		key.append(i);
 	}
 
 	@Override
@@ -59,8 +59,8 @@ class Converter implements Contents {
 	}
 
 	@Override
-	public void text(int i) {
-		builder.append((char) i);
+	public void text(char i) {
+		builder.append(i);
 	}
 
 	@Override
