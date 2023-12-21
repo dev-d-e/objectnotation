@@ -7,17 +7,18 @@ public interface Contents {
 
 	void preKey(int offset);
 
-	void key(int i);
+	void key(char i);
 
 	void postKey();
 
 	void preText();
 
-	void text(int i);
+	void text(char i);
 
 	void textArray();
 
 	void postText();
 
 	void error(int row, int n);
+
 }
