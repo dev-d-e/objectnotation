@@ -12,7 +12,6 @@ import static com.github.dev.objectnotation.Constants.isDigit;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 /**
  * Parser.
@@ -29,9 +28,11 @@ final class Parser {
 	 */
 	private int row = 1;
 
-	private IntConsumer currentFunction;
+	private CharConsumer currentFunction;
 
 	private Consumer<Header> headerConsumer;
+
+	private Offset offset;
 
 	private Contents contents;
 
@@ -49,7 +50,7 @@ final class Parser {
 
 	}
 
-	void apply(int i) {
+	void apply(char i) {
 		n++;
 		currentFunction.accept(i);
 	}
@@ -59,58 +60,60 @@ final class Parser {
 	 */
 	private StringBuilder builder;
 
-	private IntConsumer functionHeader0;
+	private CharConsumer acceptPreHeader;
 
-	private IntConsumer functionHeader1;
+	private CharConsumer acceptHeader;
+
+	private CharConsumer headerNewLine;
 
 	private Header header = new Header();
 
-	private ParseNewLine headerParseNewLine;
+	private ParseNewLine newLine;
 
-	private IntConsumer functionOffset0;
+	private CharConsumer acceptPreOffset;
 
-	private IntConsumer functionOffset1;
+	private CharConsumer acceptOffset;
 
-	private IntConsumer functionOffset2;
+	private CharConsumer offsetNewLine;
 
-	private int offsetAvailable = 1;
+	private CharConsumer offsetError;
 
-	private int offsetNumber = -1;
+	private CharConsumer acceptPreKey;
 
-	private IntConsumer functionKey0;
+	private CharConsumer acceptKey;
 
-	private IntConsumer functionKey1;
+	private CharConsumer keyBackslash;
 
-	private IntConsumer functionKeyBackslash;
+	private CharConsumer keyError;
 
-	private IntConsumer functionText0;
+	private CharConsumer acceptPreText;
 
-	private IntConsumer functionText1;
+	private CharConsumer acceptText;
 
-	private ParseNewLine textParseNewLine;
+	private CharConsumer textNewLine;
 
-	private IntConsumer functionNext0;
+	private CharConsumer textMore;
 
-	private IntConsumer functionNext1;
+	private CharConsumer textMoreError;
 
 	{
-		functionHeader0 = i -> {
+		acceptPreHeader = i -> {
 			builder = new StringBuilder();
 			if (i == NUMBERSIGN) {
-				currentFunction = functionHeader1;
+				currentFunction = acceptHeader;
 				return;
 			}
 			if (isCRLF(i)) {
 				error();
 				return;
 			}
-			currentFunction = functionOffset0;
+			currentFunction = acceptPreOffset;
 			currentFunction.accept(i);
 		};
 
-		currentFunction = functionHeader0;
+		currentFunction = acceptPreHeader;
 
-		functionHeader1 = i -> {
+		acceptHeader = i -> {
 			if (i == NUMBERSIGN) {
 				return;
 			}
@@ -118,187 +121,211 @@ final class Parser {
 				if (!header.isEmpty()) {
 					headerConsumer.accept(header);
 				}
-				currentFunction = headerParseNewLine;
+				currentFunction = headerNewLine;
 				currentFunction.accept(i);
 				return;
 			}
-			builder.append((char) i);
+			builder.append(i);
 			return;
 		};
 
-		headerParseNewLine = new ParseNewLine(() -> row++, i -> {
-			if (builder.length() > 0) {
-				String h = builder.toString().trim();
-				if (!h.isEmpty()) {
-					header.getConfiguration().add(h);
-				}
+		headerNewLine = i -> {
+			char[] s = newLine.accept(i);
+			if (s.length > 0) {
+				row++;
+				n = 0;
 			}
-			n = 0;
-			currentFunction = functionHeader0;
+			if (isCRLF(i)) {
+				return;
+			}
+			currentFunction = acceptPreHeader;
 			currentFunction.accept(i);
-		});
+		};
 
-		functionOffset0 = i -> {
-			builder = new StringBuilder();
+		acceptPreOffset = i -> {
+			offset.pre();
 			if (isDigit(i)) {
-				currentFunction = functionOffset1;
+				currentFunction = acceptOffset;
 				currentFunction.accept(i);
 			} else if (isCRLF(i)) {
-				currentFunction = functionOffset2;
+				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
 			} else if (i == -1) {
 				return;
 			}
-			currentFunction = functionOffset2;
+			currentFunction = offsetError;
 			error();
 		};
 
-		functionOffset1 = i -> {
+		acceptOffset = i -> {
 			if (isDigit(i)) {
-				builder.append((char) i);
+				offset.accept(i);
 				return;
 			} else if (i == TILDE) {
-				String offsetStr = builder.toString();
-				offsetNumber = Integer.parseInt(offsetStr);
-				if (offsetNumber == 0) {
-					offsetAvailable = 1;
-					currentFunction = functionKey0;
-					return;
-				} else if (offsetNumber > 0 && offsetNumber <= offsetAvailable) {
-					offsetAvailable = offsetNumber + 1;
-					currentFunction = functionKey0;
+				if (offset.post()) {
+					currentFunction = acceptPreKey;
 					return;
 				}
-				offsetAvailable = 0;
 			} else if (isCRLF(i)) {
-				currentFunction = functionOffset2;
+				error();
+				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
+			} else if (i == -1) {
+				return;
 			}
-			currentFunction = functionOffset2;
+			currentFunction = offsetError;
 			error();
 		};
 
-		functionOffset2 = i -> {
+		offsetNewLine = i -> {
+			char[] s = newLine.accept(i);
+			if (s.length > 0) {
+				row++;
+				n = 0;
+			}
 			if (isCRLF(i)) {
-				currentFunction = new ParseNewLine(() -> row++, j -> {
-					n = 0;
-					currentFunction = functionOffset0;
-					currentFunction.accept(j);
-				});
+				return;
+			}
+			currentFunction = acceptPreOffset;
+			currentFunction.accept(i);
+		};
+
+		offsetError = i -> {
+			if (isCRLF(i)) {
+				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
 			}
 		};
 
-		functionKey0 = i -> {
-			contents.preKey(offsetNumber);
-			if (isCRLF(i)) {
+		acceptPreKey = i -> {
+			contents.preKey(offset.getNumber());
+			if (i == COLON) {
+				currentFunction = keyError;
 				error();
-				currentFunction = functionOffset2;
+				return;
+			} else if (isCRLF(i)) {
+				error();
+				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
-			} else {
-				currentFunction = functionKey1;
-				currentFunction.accept(i);
+				return;
 			}
+			currentFunction = acceptKey;
+			currentFunction.accept(i);
 		};
 
-		functionKey1 = i -> {
+		acceptKey = i -> {
 			if (i == COLON) {
 				contents.postKey();
-				currentFunction = functionText0;
+				currentFunction = acceptPreText;
 				return;
 			} else if (i == BACKSLASH) {
-				currentFunction = functionKeyBackslash;
+				currentFunction = keyBackslash;
 				return;
 			} else if (isCRLF(i)) {
 				contents.postKey();
 				contents.postText();
-				currentFunction = functionOffset2;
+				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
 				return;
 			} else if (i == -1) {
 				contents.postKey();
 				contents.postText();
-				currentFunction = functionOffset0;
+				currentFunction = acceptPreOffset;
 				return;
 			}
-			builder.append((char) i);
+			contents.key(i);
 		};
 
-		functionKeyBackslash = i -> {
+		keyBackslash = i -> {
 			if (isCRLF(i)) {
-				currentFunction = functionKey1;
+				currentFunction = acceptKey;
 				currentFunction.accept(i);
 			}
-			builder.append((char) i);
-			currentFunction = functionKey1;
+			contents.key(i);
+			currentFunction = acceptKey;
 		};
 
-		functionText0 = i -> {
+		keyError = i -> {
+			if (isCRLF(i)) {
+				currentFunction = acceptPreOffset;
+				currentFunction.accept(i);
+			}
+		};
+
+		acceptPreText = i -> {
 			contents.preText();
-			if (i > -1 && !isCRLF(i)) {
-				offsetAvailable = offsetNumber;
-			}
-			currentFunction = functionText1;
-			currentFunction.accept(i);
-		};
-
-		functionText1 = i -> {
-			if (i == -1) {
-				contents.postText();
-				currentFunction = functionOffset0;
-				return;
-			} else if (isCRLF(i)) {
-				currentFunction = textParseNewLine;
+			if (isCRLF(i)) {
+				currentFunction = textNewLine;
 				currentFunction.accept(i);
+				return;
+			}
+			currentFunction = acceptText;
+			currentFunction.accept(i);
+		};
+
+		acceptText = i -> {
+			if (isCRLF(i)) {
+				currentFunction = textNewLine;
+				currentFunction.accept(i);
+				return;
+			} else if (i == -1) {
+				currentFunction = textNewLine;
+				currentFunction.accept(i);
+				return;
 			}
 			contents.text(i);
 		};
 
-		textParseNewLine = new ParseNewLine(i -> {
-			contents.text(i);
-			if (offsetAvailable > offsetNumber) {
-				offsetAvailable = offsetNumber;
-			}
-		}, () -> row++, i -> {
-			if (i == VERTICAL) {
-				textParseNewLine.output();
-			}
-			n = 0;
-			currentFunction = functionNext0;
-			currentFunction.accept(i);
-		});
-
-		functionNext0 = i -> {
-			if (i == -1) {
-				contents.postText();
-				currentFunction = functionOffset0;
-				return;
-			}
-			if (i == SPACE || i == VERTICAL || i == PLUS) {
-				currentFunction = functionNext1;
-				return;
-			}
-			contents.postText();
-			currentFunction = functionOffset0;
-			currentFunction.accept(i);
-		};
-
-		functionNext1 = i -> {
-			if (i == -1) {
-				contents.postText();
-				currentFunction = functionOffset0;
-				return;
-			}
+		textNewLine = i -> {
 			if (i == SPACE) {
 				return;
-			} else if (i == VERTICAL || i == PLUS) {
-				currentFunction = functionText1;
+			}
+			char[] s = newLine.accept(i);
+			if (s.length > 0) {
+				row++;
+				n = 0;
+			} else if (isCRLF(i)) {
+				return;
+			}
+			if (s.length > 0 && i == VERTICAL) {
+				for (int n = 0; n < s.length; n++) {
+					contents.text(s[n]);
+				}
+			}
+			if (i == VERTICAL || i == PLUS) {
+				currentFunction = textMore;
+				currentFunction.accept(i);
 				return;
 			}
 			contents.postText();
-			error();
-			currentFunction = functionOffset2;
+			currentFunction = acceptPreOffset;
 			currentFunction.accept(i);
+		};
+
+		textMore = i -> {
+			if (i == VERTICAL) {
+				currentFunction = acceptText;
+				return;
+			}
+			if (i == PLUS) {
+				contents.textArray();
+				currentFunction = acceptText;
+				return;
+			}
+			error();
+			if (isCRLF(i)) {
+				currentFunction = textNewLine;
+				currentFunction.accept(i);
+				return;
+			}
+			currentFunction = textMoreError;
+		};
+
+		textMoreError = i -> {
+			if (isCRLF(i)) {
+				currentFunction = textNewLine;
+				currentFunction.accept(i);
+			}
 		};
 
 	}
