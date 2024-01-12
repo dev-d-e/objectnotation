@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Root.
@@ -43,6 +41,7 @@ final class Root {
 				node.getText().ifPresent(s -> o.getText().add(s));
 				build(node.getNodes()).forEach(e -> o.getValue().add(e));
 			});
+			rst.add(o);
 		});
 		return rst;
 	}
@@ -62,22 +61,13 @@ final class Root {
 	/**
 	 * Returns declared external resource collection.
 	 */
-	public List<String> externalResources() {
+	List<String> externalResources() {
 		return externalResources;
 	}
 
 	Root externalResource(String str) {
 		externalResources.add(str);
 		return this;
-	}
-
-	/**
-	 * Returns all root nodes.
-	 */
-	List<Node> nodes() {
-		List<Node> rst = new ArrayList<>();
-		nodes.values().forEach(e -> rst.addAll(e));
-		return rst;
 	}
 
 	/**
@@ -100,29 +90,7 @@ final class Root {
 		return this;
 	}
 
-	/**
-	 * Returns node at a series of keys.
-	 * 
-	 * @param str some keys.
-	 */
-	List<Node> getNode(String str) {
-		if (str == null) {
-			return Collections.emptyList();
-		}
-		String[] keys = str.split("\\.");
-		int n = keys.length - 1;
-		Stream<Node> st = nodes.get(keys[0]).stream();
-		for (int i = 0; i < keys.length; i++) {
-			String k = keys[i];
-			st = st.filter(o -> o.getKey().equals(k));
-			if (i < n) {
-				st = st.flatMap(o -> o.getAll().stream());
-			}
-		}
-		return st.collect(Collectors.toList());
-	}
-
-	public void addNode(int offset, String key, CharSequence cs) {
+	void addNode(int offset, String key, CharSequence cs) {
 		Objects.requireNonNull(key);
 		if (offset < 0) {
 			return;
@@ -145,7 +113,7 @@ final class Root {
 		lastNode = node;
 	}
 
-	public void add(Header header) {
+	void add(Header header) {
 		header.getConfiguration().forEach(s -> configure(s, s));
 		header.getExternalResources().forEach(s -> externalResource(s));
 	}
