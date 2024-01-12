@@ -2,6 +2,7 @@ package com.github.dev.objectnotation;
 
 import static com.github.dev.objectnotation.Constants.BACKSLASH;
 import static com.github.dev.objectnotation.Constants.COLON;
+import static com.github.dev.objectnotation.Constants.END;
 import static com.github.dev.objectnotation.Constants.NUMBERSIGN;
 import static com.github.dev.objectnotation.Constants.PLUS;
 import static com.github.dev.objectnotation.Constants.SPACE;
@@ -10,8 +11,8 @@ import static com.github.dev.objectnotation.Constants.VERTICAL;
 import static com.github.dev.objectnotation.Constants.isCRLF;
 import static com.github.dev.objectnotation.Constants.isDigit;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Parser.
@@ -21,33 +22,40 @@ final class Parser {
 	/**
 	 * counter
 	 */
-	private int n = -1;
+	private int n = 0;
 
 	/**
 	 * row number
 	 */
 	private int row = 1;
 
-	private CharConsumer currentFunction;
+	private ParseNewLine newLine = new ParseNewLine();
 
-	private Consumer<Header> headerConsumer;
+	private StringBuilder builder;
 
-	private Offset offset;
+	private Header header = new Header();
+
+	private Offset offset = new Offset();
 
 	private Contents contents;
 
 	/**
 	 * Constructs a {@code Parser} with consumers.
 	 *
-	 * @param headerConsumer the consumer of the header.
-	 * @param contents       the consumer of the key,text,error.
+	 * @param contents the consumer of the key,text,error.
 	 */
-	Parser(Consumer<Header> headerConsumer, Contents contents) {
-		Objects.requireNonNull(headerConsumer);
+	Parser(Contents contents) {
 		Objects.requireNonNull(contents);
-		this.headerConsumer = headerConsumer;
 		this.contents = contents;
+	}
 
+	private void reset() {
+		n = 0;
+		row = 1;
+		currentFunction = acceptPreHeader;
+		newLine = new ParseNewLine();
+		header = new Header();
+		offset = new Offset();
 	}
 
 	void apply(char i) {
@@ -58,17 +66,13 @@ final class Parser {
 	/**
 	 * parse structure.
 	 */
-	private StringBuilder builder;
+	private CharConsumer currentFunction;
 
 	private CharConsumer acceptPreHeader;
 
 	private CharConsumer acceptHeader;
 
 	private CharConsumer headerNewLine;
-
-	private Header header = new Header();
-
-	private ParseNewLine newLine;
 
 	private CharConsumer acceptPreOffset;
 
@@ -118,9 +122,8 @@ final class Parser {
 				return;
 			}
 			if (isCRLF(i)) {
-				if (!header.isEmpty()) {
-					headerConsumer.accept(header);
-				}
+				header.getConfiguration().add(builder.toString());
+				builder = new StringBuilder();
 				currentFunction = headerNewLine;
 				currentFunction.accept(i);
 				return;
@@ -130,8 +133,8 @@ final class Parser {
 		};
 
 		headerNewLine = i -> {
-			char[] s = newLine.accept(i);
-			if (s.length > 0) {
+			List<Character> s = newLine.accept(i);
+			if (s.size() > 0) {
 				row++;
 				n = 0;
 			}
@@ -147,10 +150,13 @@ final class Parser {
 			if (isDigit(i)) {
 				currentFunction = acceptOffset;
 				currentFunction.accept(i);
+				return;
 			} else if (isCRLF(i)) {
 				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
-			} else if (i == -1) {
+				return;
+			} else if (i == END) {
+				reset();
 				return;
 			}
 			currentFunction = offsetError;
@@ -170,7 +176,9 @@ final class Parser {
 				error();
 				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
-			} else if (i == -1) {
+				return;
+			} else if (i == END) {
+				reset();
 				return;
 			}
 			currentFunction = offsetError;
@@ -178,8 +186,8 @@ final class Parser {
 		};
 
 		offsetNewLine = i -> {
-			char[] s = newLine.accept(i);
-			if (s.length > 0) {
+			List<Character> s = newLine.accept(i);
+			if (s.size() > 0) {
 				row++;
 				n = 0;
 			}
@@ -227,10 +235,10 @@ final class Parser {
 				currentFunction = offsetNewLine;
 				currentFunction.accept(i);
 				return;
-			} else if (i == -1) {
+			} else if (i == END) {
 				contents.postKey();
 				contents.postText();
-				currentFunction = acceptPreOffset;
+				reset();
 				return;
 			}
 			contents.key(i);
@@ -240,6 +248,7 @@ final class Parser {
 			if (isCRLF(i)) {
 				currentFunction = acceptKey;
 				currentFunction.accept(i);
+				return;
 			}
 			contents.key(i);
 			currentFunction = acceptKey;
@@ -268,7 +277,7 @@ final class Parser {
 				currentFunction = textNewLine;
 				currentFunction.accept(i);
 				return;
-			} else if (i == -1) {
+			} else if (i == END) {
 				currentFunction = textNewLine;
 				currentFunction.accept(i);
 				return;
@@ -280,17 +289,15 @@ final class Parser {
 			if (i == SPACE) {
 				return;
 			}
-			char[] s = newLine.accept(i);
-			if (s.length > 0) {
+			List<Character> s = newLine.accept(i);
+			if (s.size() > 0) {
 				row++;
 				n = 0;
 			} else if (isCRLF(i)) {
 				return;
 			}
-			if (s.length > 0 && i == VERTICAL) {
-				for (int n = 0; n < s.length; n++) {
-					contents.text(s[n]);
-				}
+			if (s.size() > 0 && i == VERTICAL) {
+				s.forEach(c -> contents.text(c));
 			}
 			if (i == VERTICAL || i == PLUS) {
 				currentFunction = textMore;
@@ -298,6 +305,10 @@ final class Parser {
 				return;
 			}
 			contents.postText();
+			if (i == END) {
+				reset();
+				return;
+			}
 			currentFunction = acceptPreOffset;
 			currentFunction.accept(i);
 		};
