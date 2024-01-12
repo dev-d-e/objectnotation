@@ -3,6 +3,9 @@ package com.github.dev.objectnotation;
 import static com.github.dev.objectnotation.Constants.CR;
 import static com.github.dev.objectnotation.Constants.LF;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Parse CR and LF.
  */
@@ -12,11 +15,10 @@ final class ParseNewLine {
 
 	private boolean hasLF = false;
 
-	private char[] t = { 0, 0 };
+	private List<Character> t = new ArrayList<>();
 
-	public char[] accept(char i) {
-		t[0] = 0;
-		t[1] = 0;
+	public List<Character> accept(char i) {
+		t.clear();
 		if (hasCR && hasLF) {
 			hasCRLF(i);
 		} else if (hasCR) {
@@ -32,8 +34,8 @@ final class ParseNewLine {
 	}
 
 	private void hasCRLF(int i) {
-		t[0] = CR;
-		t[1] = LF;
+		t.add(CR);
+		t.add(LF);
 		if (i == CR) {
 			hasLF = false;
 		} else if (i == LF) {
@@ -46,12 +48,12 @@ final class ParseNewLine {
 
 	private void hasCR(int i) {
 		if (i == CR) {
-			t[0] = CR;
+			t.add(CR);
 		} else if (i == LF) {
 			hasLF = true;
 		} else {
 			hasCR = false;
-			t[0] = CR;
+			t.add(CR);
 		}
 	}
 
@@ -59,12 +61,12 @@ final class ParseNewLine {
 		if (i == CR) {
 			hasCR = true;
 			hasLF = false;
-			t[0] = LF;
+			t.add(LF);
 		} else if (i == LF) {
-			t[0] = LF;
+			t.add(LF);
 		} else {
 			hasLF = false;
-			t[0] = LF;
+			t.add(LF);
 		}
 	}
 
