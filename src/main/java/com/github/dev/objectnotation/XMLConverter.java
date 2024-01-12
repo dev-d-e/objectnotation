@@ -1,6 +1,8 @@
 package com.github.dev.objectnotation;
 
-import java.util.LinkedList;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.List;
 
 /**
  * XML Converter.
@@ -11,80 +13,68 @@ public final class XMLConverter {
 	}
 
 	/**
-	 * convert text.
-	 *
-	 * @param charSequence the text.
+	 * Convert text to XML.
 	 */
 	public static String convert(CharSequence charSequence) {
-		Converter c = new Converter();
-		ResolveTextInvoker.accept(charSequence, c);
-		return c.toXML();
+		return convert(ResolveTextInvoker.accept(charSequence));
 	}
 
-}
-
-class Converter implements Contents {
-	LinkedList<String> keys = new LinkedList<>();
-	int i;
-	StringBuilder key = new StringBuilder();
-	StringBuilder builder = new StringBuilder();
-
-	@Override
-	public void preKey(int offset) {
-		this.i = offset;
+	/**
+	 * Convert text to XML.
+	 */
+	public static String convert(char[] array) {
+		return convert(ResolveTextInvoker.accept(array));
 	}
 
-	@Override
-	public void key(char i) {
-		key.append(i);
+	/**
+	 * Convert text to XML.
+	 */
+	public static String convert(Reader reader) throws IOException {
+		return convert(ResolveTextInvoker.accept(reader));
 	}
 
-	@Override
-	public void postKey() {
-		while (i <= keys.size() - 1) {
-			builder.append('<');
-			builder.append(keys.pop());
-			builder.append("/>");
-		}
-		keys.push(key.toString());
-		builder.append('<');
-		builder.append(key);
-		builder.append('>');
-		key = new StringBuilder();
-	}
-
-	@Override
-	public void preText() {
-
-	}
-
-	@Override
-	public void text(char i) {
-		builder.append(i);
-	}
-
-	@Override
-	public void textArray() {
-
-	}
-
-	@Override
-	public void postText() {
-
-	}
-
-	@Override
-	public void error(int row, int n) {
-
-	}
-
-	public String toXML() {
-		while (keys.size() > 0) {
-			builder.append('<');
-			builder.append(keys.pop());
-			builder.append("/>");
-		}
+	/**
+	 * Convert List Target to XML.
+	 */
+	public static String convert(List<Target> targets) {
+		StringBuilder builder = new StringBuilder();
+		targets.forEach(t -> toXML(builder, t));
 		return builder.toString();
 	}
 
+	/**
+	 * Convert Target to XML.
+	 */
+	public static String convert(Target target) {
+		StringBuilder builder = new StringBuilder();
+		toXML(builder, target);
+		return builder.toString();
+	}
+
+	private static void toXML(StringBuilder builder, Target target) {
+		String n = target.getName();
+		target.getText().forEach(t -> {
+			addTag(builder, n, t);
+		});
+		String s = convert(target.getValue());
+		if (s != null && s.length() > 0) {
+			addTag(builder, n, s);
+		}
+	}
+
+	/**
+	 * append tag.
+	 */
+	private static void addTag(StringBuilder builder, String tagName, CharSequence text) {
+		builder.append('<');
+		builder.append(tagName);
+		builder.append('>');
+		if (text != null && text.length() > 0) {
+			builder.append(text);
+		}
+		builder.append('<');
+		builder.append('/');
+		builder.append(tagName);
+		builder.append('>');
+	}
 }
