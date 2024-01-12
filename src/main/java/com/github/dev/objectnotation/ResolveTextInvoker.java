@@ -1,8 +1,14 @@
 package com.github.dev.objectnotation;
 
+import static com.github.dev.objectnotation.Constants.END;
+
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Invoker provides static methods.
@@ -25,11 +31,11 @@ public final class ResolveTextInvoker {
 		if (array == null || array.length == 0) {
 			return;
 		}
-		StandardResolver emptyResolver = new StandardResolver(contents);
+		Parser parser = new Parser(contents);
 		for (int n = 0; n < array.length; n++) {
-			emptyResolver.apply(array[n]);
+			parser.apply(array[n]);
 		}
-		emptyResolver.apply(-1);
+		parser.apply(END);
 	}
 
 	/**
@@ -42,9 +48,9 @@ public final class ResolveTextInvoker {
 		if (charSequence == null || charSequence.length() == 0) {
 			return;
 		}
-		StandardResolver emptyResolver = new StandardResolver(contents);
-		charSequence.chars().forEach(i -> emptyResolver.apply(i));
-		emptyResolver.apply(-1);
+		Parser parser = new Parser(contents);
+		charSequence.chars().forEach(i -> parser.apply((char) i));
+		parser.apply(END);
 	}
 
 	/**
@@ -57,11 +63,14 @@ public final class ResolveTextInvoker {
 		if (reader == null) {
 			return;
 		}
-		StandardResolver emptyResolver = new StandardResolver(contents);
+		Parser parser = new Parser(contents);
 		while (true) {
 			int i = reader.read();
-			emptyResolver.apply(i);
 			if (i == -1) {
+				i = END;
+			}
+			parser.apply((char) i);
+			if (i == END) {
 				break;
 			}
 		}
@@ -71,7 +80,7 @@ public final class ResolveTextInvoker {
 	 * Resolve text, output {@code List<Target>}.
 	 *
 	 * @param array the text.
-	 * @return List<Target>
+	 * @return List
 	 */
 	public static List<Target> accept(char[] array) {
 		TreeBuilder builder = new TreeBuilder();
@@ -83,7 +92,7 @@ public final class ResolveTextInvoker {
 	 * Resolve text, output {@code List<Target>}.
 	 *
 	 * @param charSequence the text.
-	 * @return List<Target>
+	 * @return List
 	 */
 	public static List<Target> accept(CharSequence charSequence) {
 		TreeBuilder builder = new TreeBuilder();
@@ -95,7 +104,7 @@ public final class ResolveTextInvoker {
 	 * Resolve text, output {@code List<Target>}. the reader is not closed.
 	 *
 	 * @param reader the text.
-	 * @return List<Target>
+	 * @return List
 	 */
 	public static List<Target> accept(Reader reader) throws IOException {
 		TreeBuilder builder = new TreeBuilder();
@@ -104,78 +113,117 @@ public final class ResolveTextInvoker {
 	}
 
 	/**
-	 * Resolve text.
+	 * Convert Target to Object.
 	 *
-	 * @param array the text.
-	 * @param obj   the output.
-	 */
-	public static <T> void accept(char[] array, T obj) {
-		TreeBuilder builder = new TreeBuilder();
-		accept(array, builder);
-		ObjectBuilder.build(builder.getRoot(), obj);
-	}
-
-	/**
-	 * Resolve text.
-	 *
-	 * @param array the text.
-	 * @param type  the class.
+	 * @param target Target.
+	 * @param obj    T.
 	 * @return T
 	 */
-	public static <T> T accept(char[] array, Class<T> type) {
-		TreeBuilder builder = new TreeBuilder();
-		accept(array, builder);
-		return ObjectBuilder.build(builder.getRoot(), type);
+	public static <T> T convert(Target target, T obj) {
+		return ObjectBuilder.build(target, obj);
 	}
 
 	/**
-	 * Resolve text.
+	 * Convert Target to Object.
 	 *
-	 * @param charSequence the text.
-	 * @param obj          the output.
+	 * @param targetList List.
+	 * @param getObj     the output.
+	 * @return List
 	 */
-	public static <T> void accept(CharSequence charSequence, T obj) {
-		TreeBuilder builder = new TreeBuilder();
-		accept(charSequence, builder);
-		ObjectBuilder.build(builder.getRoot(), obj);
+	public static <T> List<T> convert(List<Target> targetList, Supplier<T> getObj) {
+		List<T> rst = new ArrayList<>();
+		targetList.forEach(target -> {
+			T obj = convert(target, getObj.get());
+			rst.add(obj);
+		});
+		return rst;
 	}
 
 	/**
-	 * Resolve text.
+	 * Convert Target to Object.
 	 *
-	 * @param charSequence the text.
-	 * @param type         the class.
+	 * @param target Target.
+	 * @param type   Class.
 	 * @return T
 	 */
-	public static <T> T accept(CharSequence charSequence, Class<T> type) {
-		TreeBuilder builder = new TreeBuilder();
-		accept(charSequence, type);
-		return ObjectBuilder.build(builder.getRoot(), type);
+	public static <T> T convert(Target target, Class<T> type) {
+		return ObjectBuilder.build(target, type);
 	}
 
 	/**
-	 * Resolve text. the reader is not closed.
+	 * Convert Target to Object.
 	 *
-	 * @param reader the text.
-	 * @param obj    the output.
+	 * @param targetList List.
+	 * @param type       Class.
+	 * @return List
 	 */
-	public static <T> void accept(Reader reader, T obj) throws IOException {
-		TreeBuilder builder = new TreeBuilder();
-		accept(reader, builder);
-		ObjectBuilder.build(builder.getRoot(), obj);
+	public static <T> List<T> convert(List<Target> targetList, Class<T> type) {
+		List<T> rst = new ArrayList<>();
+		targetList.forEach(target -> {
+			T obj = convert(target, type);
+			rst.add(obj);
+		});
+		return rst;
 	}
 
 	/**
-	 * Resolve text. the reader is not closed.
+	 * Convert Target to Map. use separator to join key.
 	 *
-	 * @param reader the text.
-	 * @param type   the class.
-	 * @return T
+	 * @param target    Target
+	 * @param separator String
+	 * @return Map
 	 */
-	public static <T> T accept(Reader reader, Class<T> type) throws IOException {
-		TreeBuilder builder = new TreeBuilder();
-		accept(reader, builder);
-		return ObjectBuilder.build(builder.getRoot(), type);
+	public static Map<String, List<String>> toMap(Target target, String separator) {
+		Map<List<String>, List<String>> map = new HashMap<>();
+		List<String> keyList = new ArrayList<>();
+		targetToMap(target, keyList, map);
+		Map<String, List<String>> rst = new HashMap<>();
+		map.forEach((k, v) -> rst.put(toKey(k, separator), v));
+		return rst;
 	}
 
+	/**
+	 * Convert List Target to Map. use separator to join key.
+	 *
+	 * @param targetList List
+	 * @param separator  String
+	 * @return Map
+	 */
+	public static Map<String, List<String>> toMap(List<Target> targetList, String separator) {
+		Map<List<String>, List<String>> map = new HashMap<>();
+		for (Target target : targetList) {
+			List<String> keyList = new ArrayList<>();
+			targetToMap(target, keyList, map);
+		}
+		Map<String, List<String>> rst = new HashMap<>();
+		map.forEach((k, v) -> rst.put(toKey(k, separator), v));
+		return rst;
+	}
+
+	private static void targetToMap(Target target, List<String> keyList, Map<List<String>, List<String>> map) {
+		keyList.add(target.getName());
+		List<String> text = target.getText();
+		if (text.size() > 0) {
+			map.put(new ArrayList<>(keyList), text);
+		}
+		for (Target c : target.getValue()) {
+			targetToMap(c, keyList, map);
+		}
+		keyList.remove(keyList.size() - 1);
+	}
+
+	private static String toKey(List<String> keyList, String separator) {
+		if (keyList.isEmpty()) {
+			return "";
+		}
+		if (separator == null) {
+			separator = "";
+		}
+		StringBuilder builder = new StringBuilder();
+		for (String s : keyList) {
+			builder.append(s);
+			builder.append(separator);
+		}
+		return builder.substring(0, builder.length() - separator.length());
+	}
 }
