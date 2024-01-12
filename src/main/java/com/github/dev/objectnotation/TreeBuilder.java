@@ -24,6 +24,7 @@ final class TreeBuilder implements Contents {
 	@Override
 	public void preKey(int offset) {
 		this.offset = offset;
+		key = new StringBuilder();
 	}
 
 	@Override
@@ -37,6 +38,7 @@ final class TreeBuilder implements Contents {
 
 	@Override
 	public void preText() {
+		text = new StringBuilder();
 	}
 
 	@Override
@@ -46,24 +48,19 @@ final class TreeBuilder implements Contents {
 
 	@Override
 	public void textArray() {
-		root.addNode(offset, key.toString(), text);
-		text = new StringBuilder();
+		postText();
+		preText();
 	}
 
 	@Override
 	public void postText() {
 		root.addNode(offset, key.toString(), text);
-		key = new StringBuilder();
 		text = new StringBuilder();
 	}
 
 	@Override
 	public void error(int row, int n) {
 		setErr(row, n);
-	}
-
-	public Root getRoot() {
-		return root;
 	}
 
 	public List<Target> build() {
