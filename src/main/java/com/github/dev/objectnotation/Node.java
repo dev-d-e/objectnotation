@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Node in a tree.
@@ -26,22 +25,14 @@ final class Node {
 	 *
 	 * @param offset the offset number.
 	 * @param key    the key.
-	 */
-	Node(int offset, String key) {
-		this.offset = offset;
-		this.key = key;
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param offset the offset number.
-	 * @param key    the key.
 	 * @param cs     the text.
 	 */
 	Node(int offset, String key, CharSequence cs) {
-		this(offset, key);
-		setText(cs);
+		this.offset = offset;
+		this.key = key;
+		if (cs != null && cs.length() > 0) {
+			this.text = cs.toString();
+		}
 	}
 
 	/**
@@ -107,54 +98,18 @@ final class Node {
 	/**
 	 * Returns all child nodes.
 	 */
-	List<Node> getAll() {
-		List<Node> rst = new ArrayList<>();
-		nodes.values().forEach(e -> rst.addAll(e));
-		return rst;
-	}
-
-	/**
-	 * Returns all child nodes.
-	 */
 	LinkedHashMap<String, List<Node>> getNodes() {
 		return nodes;
-	}
-
-	/**
-	 * Returns child nodes by key.
-	 * 
-	 * @param key the key of the node.
-	 */
-	List<Node> get(String key) {
-		return nodes.get(key).stream().filter(o -> o.getKey().equals(key)).collect(Collectors.toList());
-	}
-
-	/**
-	 * Set text.
-	 * 
-	 * @param text the text.
-	 */
-	Node setText(CharSequence cs) {
-		if (cs != null) {
-			this.text = cs.toString();
-		}
-		return this;
 	}
 
 	/**
 	 * Returns text.
 	 */
 	Optional<String> getText() {
-		if (text.isEmpty()) {
+		if (text == null || text.isEmpty()) {
 			return Optional.ofNullable(null);
 		}
 		return Optional.ofNullable(text);
 	}
 
-	/**
-	 * Returns text's type adapter.
-	 */
-	TextTypeAdapter getTypeAdapter() {
-		return TextTypeAdapter.of(getText().get());
-	}
 }
