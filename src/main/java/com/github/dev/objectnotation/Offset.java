@@ -5,8 +5,14 @@ package com.github.dev.objectnotation;
  */
 final class Offset {
 
+	/**
+	 * max available value for next offset.
+	 */
 	private int available;
 
+	/**
+	 * offset.
+	 */
 	private int number;
 
 	private StringBuilder builder;
@@ -15,24 +21,8 @@ final class Offset {
 		return available;
 	}
 
-	public void setAvailable(int available) {
-		this.available = available;
-	}
-
 	public int getNumber() {
 		return number;
-	}
-
-	public void setNumber(int number) {
-		this.number = number;
-	}
-
-	public StringBuilder getBuilder() {
-		return builder;
-	}
-
-	public void setBuilder(StringBuilder builder) {
-		this.builder = builder;
 	}
 
 	public void pre() {
@@ -45,11 +35,16 @@ final class Offset {
 
 	public boolean post() {
 		String offsetStr = builder.toString();
-		int offsetNumber = Integer.parseInt(offsetStr);
-		if (offsetNumber > this.available) {
+		try {
+			number = Integer.parseInt(offsetStr, 16);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
 			return false;
 		}
-		this.available = offsetNumber + 1;
+		if (number > available) {
+			return false;
+		}
+		available = number + 1;
 		return true;
 	}
 }
